@@ -1,0 +1,153 @@
+### Health Check
+GET http://localhost:4000/api/v1/health
+
+### Daftar Menu
+GET http://localhost:4000/api/v1/menus
+
+### Daftar Menu - Filter Kategori
+GET http://localhost:4000/api/v1/menus?category=Kopi
+
+### Daftar Menu - Pencarian
+GET http://localhost:4000/api/v1/menus?q=lost%20sheep
+
+### Daftar Menu - Featured
+GET http://localhost:4000/api/v1/menus?featured=true
+
+### Kategori Menu
+GET http://localhost:4000/api/v1/menus/categories
+
+### Detail Menu (ganti UUID)
+GET http://localhost:4000/api/v1/menus/00000000-0000-0000-0000-000000000001
+
+### Daftar Event Mendatang
+GET http://localhost:4000/api/v1/events
+
+### Daftar Event Sudah Berlalu
+GET http://localhost:4000/api/v1/events?scope=past
+
+### Semua Event
+GET http://localhost:4000/api/v1/events?scope=all
+
+### Detail Event (ganti UUID)
+GET http://localhost:4000/api/v1/events/00000000-0000-0000-0000-000000000001
+
+### Chat
+POST http://localhost:4000/api/v1/chat
+Content-Type: application/json
+
+{
+  "session_id": "test_session_001",
+  "message": "menu kopi apa saja?"
+}
+
+### Pesan via WhatsApp (ganti menu_id dengan UUID valid)
+POST http://localhost:4000/api/v1/orders/whatsapp-link
+Content-Type: application/json
+
+{
+  "items": [
+    { "menu_id": "UUID_MENU_1", "quantity": 2, "variant": "Iced" },
+    { "menu_id": "UUID_MENU_2", "quantity": 1 }
+  ],
+  "note": "Tidak pakai gula"
+}
+
+### Login Admin
+POST http://localhost:4000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "himar@admin.com",
+  "password": "andrebaiksekali"
+}
+
+### Refresh Token (ganti dengan token valid)
+POST http://localhost:4000/api/v1/auth/refresh
+Content-Type: application/json
+
+{
+  "refresh_token": "REFRESH_TOKEN_HERE"
+}
+
+### Info Admin (ganti token)
+GET http://localhost:4000/api/v1/auth/me
+Authorization: Bearer ACCESS_TOKEN_HERE
+
+### Admin: Tambah Menu (ganti token)
+POST http://localhost:4000/api/v1/admin/menus
+Authorization: Bearer ACCESS_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "name": "Espresso",
+  "description": "Espresso klasik",
+  "price": 18000,
+  "category": "Kopi",
+  "variants": [
+    { "name": "Hot", "extra_price": 0 },
+    { "name": "Iced", "extra_price": 3000 }
+  ],
+  "is_featured": false,
+  "is_available": true
+}
+
+### Admin: Ubah Menu (ganti UUID dan token)
+PUT http://localhost:4000/api/v1/admin/menus/UUID_HERE
+Authorization: Bearer ACCESS_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "name": "Espresso Updated",
+  "price": 20000,
+  "category": "Kopi"
+}
+
+### Admin: Hapus Menu (ganti UUID dan token)
+DELETE http://localhost:4000/api/v1/admin/menus/UUID_HERE
+Authorization: Bearer ACCESS_TOKEN_HERE
+
+### Admin: Tambah Event (ganti token)
+POST http://localhost:4000/api/v1/admin/events
+Authorization: Bearer ACCESS_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "title": "Live Music Friday",
+  "description": "Penampilan akustik setiap Jumat malam",
+  "event_date": "2025-02-14T19:00:00+07:00",
+  "location": "Indoor Stage",
+  "is_published": true
+}
+
+### Admin: Semua Event (termasuk draft)
+GET http://localhost:4000/api/v1/admin/events
+Authorization: Bearer ACCESS_TOKEN_HERE
+
+### Admin: Ubah Event (ganti UUID dan token)
+PUT http://localhost:4000/api/v1/admin/events/UUID_HERE
+Authorization: Bearer ACCESS_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "title": "Live Music Saturday",
+  "event_date": "2025-02-15T19:00:00+07:00"
+}
+
+### Admin: Hapus Event (ganti UUID dan token)
+DELETE http://localhost:4000/api/v1/admin/events/UUID_HERE
+Authorization: Bearer ACCESS_TOKEN_HERE
+
+### Admin: Upload Gambar (gunakan form-data, bukan JSON)
+# POST http://localhost:4000/api/v1/admin/uploads
+# Authorization: Bearer ACCESS_TOKEN_HERE
+# Content-Type: multipart/form-data; boundary=----
+# file: (pilih file gambar)
+# folder: menus
+
+### Admin: Riwayat Chat
+GET http://localhost:4000/api/v1/admin/chat-logs?page=1&limit=20
+Authorization: Bearer ACCESS_TOKEN_HERE
+
+### Admin: Riwayat Chat - Filter Intent
+GET http://localhost:4000/api/v1/admin/chat-logs?intent=tanya_menu
+Authorization: Bearer ACCESS_TOKEN_HERE
