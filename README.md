@@ -43,22 +43,22 @@ Platform etalase digital modern, asisten chatbot AI cerdas, dan dasbor analitik 
 
 ```mermaid
 flowchart TD
-    subgraph Client["💻 Pengguna & Browser Klien"]
-        Browser["🌐 Web Himar Coffee<br/>(React 18 + Vite + Tailwind v4)"]
+    subgraph Client[" Pengguna & Browser Klien"]
+        Browser[" Web Himar Coffee<br/>(React 18 + Vite + Tailwind v4)"]
     end
 
-    subgraph CoreServices["⚙️ Layanan Aplikasi"]
-        Backend["🚀 Backend REST API<br/>(Node.js Express ESM)"]
-        Streamlit["📊 Dasbor Penjualan<br/>(Python Streamlit)"]
-        AIService["🤖 AI Service<br/>(FastAPI + Groq LLM)"]
+    subgraph CoreServices[" Layanan Aplikasi"]
+        Backend[" Backend REST API<br/>(Node.js Express ESM)"]
+        Streamlit[" Dasbor Penjualan<br/>(Python Streamlit)"]
+        AIService[" AI Service<br/>(FastAPI + Groq LLM)"]
     end
 
-    subgraph CloudInfra["☁️ Cloud & Layanan Eksternal"]
-        DB[("🗄️ PostgreSQL Supabase<br/>(Menus, Events, Sales, Logs)")]
-        Storage["📦 Supabase Storage<br/>(Bucket menu-images)"]
-        Auth["🔐 Supabase Auth<br/>(JWT Token Bearer)"]
-        Groq["⚡ Groq Cloud<br/>(LLaMA 3.3 70B Versatile)"]
-        WhatsApp["💬 WhatsApp Kasir<br/>(Pemesanan Terverifikasi)"]
+    subgraph CloudInfra[" Cloud & Layanan Eksternal"]
+        DB[(" PostgreSQL Supabase<br/>(Menus, Events, Sales, Logs)")]
+        Storage[" Supabase Storage<br/>(Bucket menu-images)"]
+        Auth[" Supabase Auth<br/>(JWT Token Bearer)"]
+        Groq[" Groq Cloud<br/>(LLaMA 3.3 70B Versatile)"]
+        WhatsApp[" WhatsApp Kasir<br/>(Pemesanan Terverifikasi)"]
     end
 
     Browser -->|"HTTP REST API (/api/v1)"| Backend
@@ -90,13 +90,13 @@ flowchart TD
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Pelanggan as 👤 Pelanggan
-    participant Web as 🌐 Frontend (React)
-    participant API as 🚀 Backend (Express)
-    participant AI as 🤖 AI Service (FastAPI)
-    participant Groq as ⚡ Groq Cloud (LLM)
-    participant DB as 🗄️ Supabase DB
-    actor Kasir as ☕ Kasir / Barista
+    actor Pelanggan as  Pelanggan
+    participant Web as  Frontend (React)
+    participant API as  Backend (Express)
+    participant AI as  AI Service (FastAPI)
+    participant Groq as  Groq Cloud (LLM)
+    participant DB as  Supabase DB
+    actor Kasir as  Kasir / Barista
 
     rect rgb(250, 244, 234)
     note over Pelanggan, Groq: 1. Percakapan Chatbot AI (RAG)
