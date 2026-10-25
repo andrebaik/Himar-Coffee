@@ -43,10 +43,12 @@ CREATE TABLE IF NOT EXISTS chat_logs (
 -- Tabel sales (dipakai tim Data Science, backend tidak menyentuh)
 CREATE TABLE IF NOT EXISTS sales (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  menu_id UUID REFERENCES menus(id),
+  menu_name TEXT NOT NULL,
+  category TEXT NOT NULL,
+  unit_price INTEGER NOT NULL,
   quantity INTEGER NOT NULL DEFAULT 1,
-  total_price INTEGER NOT NULL,
-  sale_date TIMESTAMPTZ DEFAULT now(),
+  total_amount INTEGER NOT NULL,
+  transaction_date TIMESTAMPTZ DEFAULT now(),
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
