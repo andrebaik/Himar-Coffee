@@ -41,27 +41,85 @@ Platform etalase digital modern, asisten chatbot AI cerdas, dan dasbor analitik 
 
 ## 3. Arsitektur Sistem
 
+```mermaid
+flowchart TD
+    subgraph Client["💻 Pengguna & Browser Klien"]
+        Browser["🌐 Web Himar Coffee<br/>(React 18 + Vite + Tailwind v4)"]
+    end
+
+    subgraph CoreServices["⚙️ Layanan Aplikasi"]
+        Backend["🚀 Backend REST API<br/>(Node.js Express ESM)"]
+        Streamlit["📊 Dasbor Penjualan<br/>(Python Streamlit)"]
+        AIService["🤖 AI Service<br/>(FastAPI + Groq LLM)"]
+    end
+
+    subgraph CloudInfra["☁️ Cloud & Layanan Eksternal"]
+        DB[("🗄️ PostgreSQL Supabase<br/>(Menus, Events, Sales, Logs)")]
+        Storage["📦 Supabase Storage<br/>(Bucket menu-images)"]
+        Auth["🔐 Supabase Auth<br/>(JWT Token Bearer)"]
+        Groq["⚡ Groq Cloud<br/>(LLaMA 3.3 70B Versatile)"]
+        WhatsApp["💬 WhatsApp Kasir<br/>(Pemesanan Terverifikasi)"]
+    end
+
+    Browser -->|"HTTP REST API (/api/v1)"| Backend
+    Browser -->|"Iframe Embed"| Streamlit
+    Browser -.->|"Tautan Checkout"| WhatsApp
+
+    Backend -->|"Query / Transaksi"| DB
+    Backend -->|"Verifikasi Autentikasi"| Auth
+    Backend -->|"Upload Foto Menu"| Storage
+    Backend -->|"Request RAG Chat (/api/v1/chat)"| AIService
+
+    AIService -->|"Inference Prompting"| Groq
+    AIService -.->|"Sinkronisasi Katalog Menu"| Backend
+
+    Streamlit -->|"Query Data Penjualan (sales)"| DB
+
+    %% Styling
+    classDef client fill:#FAF4EA,stroke:#B5532C,stroke-width:2px,color:#2B1B12;
+    classDef service fill:#FFFFFF,stroke:#6F8F72,stroke-width:2px,color:#2B1B12;
+    classDef cloud fill:#F9FAFB,stroke:#4B5563,stroke-width:1.5px,color:#111827;
+
+    class Browser client;
+    class Backend,Streamlit,AIService service;
+    class DB,Storage,Auth,Groq,WhatsApp cloud;
 ```
-                      +-----------------------------+
-                      |       Browser Klien         |
-                      |   (React + Vite + Tailwind) |
-                      +--------------+--------------+
-                                     |
-               +---------------------+---------------------+
-               | HTTP (/api/v1)                            | iframe
-               v                                           v
-+-----------------------------+               +-----------------------------+
-|       Backend Service       |               |     Dasbor Penjualan        |
-|    (Node.js Express ESM)    |               |         (Streamlit)         |
-+-------+--------------+------+               +--------------+--------------+
-        |              |                                     |
-        |              +---------------+                     |
-        v                              v                     v
-+----------------+             +----------------+    +----------------+
-|  AI Service    |             | Supabase Cloud |    | Supabase Cloud |
-| (FastAPI+Groq) |             | (Postgres/Auth/|    | (Tabel Sales)  |
-+----------------+             |    Storage)    |    +----------------+
-                               +----------------+
+
+### Alur Kerja Sistem (Sequence Diagram)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Pelanggan as 👤 Pelanggan
+    participant Web as 🌐 Frontend (React)
+    participant API as 🚀 Backend (Express)
+    participant AI as 🤖 AI Service (FastAPI)
+    participant Groq as ⚡ Groq Cloud (LLM)
+    participant DB as 🗄️ Supabase DB
+    actor Kasir as ☕ Kasir / Barista
+
+    rect rgb(250, 244, 234)
+    note over Pelanggan, Groq: 1. Percakapan Chatbot AI (RAG)
+    Pelanggan->>Web: Ajukan pertanyaan ("Rekomendasi kopi manis?")
+    Web->>API: POST /api/v1/chat
+    API->>AI: Forward request (session + message)
+    AI->>Groq: Inference LLaMA dengan konteks katalog teraktual
+    Groq-->>AI: Jawaban rekomendasi ramah + tombol aksi rute
+    AI-->>API: Response {reply, intent, actions}
+    API->>DB: Simpan log ke tabel chat_logs
+    API-->>Web: Tampilkan balon chat & quick action button
+    end
+
+    rect rgb(245, 247, 250)
+    note over Pelanggan, Kasir: 2. Checkout Pesanan via WhatsApp
+    Pelanggan->>Web: Tambah menu & varian ke keranjang
+    Pelanggan->>Web: Klik "Kirim Pesanan ke WhatsApp"
+    Web->>API: POST /api/v1/orders/whatsapp-link (items, nama, catatan)
+    API->>DB: Validasi menu_id & hitung total harga resmi (Anti-manipulasi)
+    API-->>Web: Response link WhatsApp terenkripsi URI
+    Web->>Kasir: Redirect ke WhatsApp dengan format pesanan rapi
+    Kasir-->>Pelanggan: Barista konfirmasi pesanan & instruksi pembayaran
+    end
 ```
 
 ---
