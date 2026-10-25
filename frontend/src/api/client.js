@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getSession, setSession, clearSession } from '../lib/session.js';
 
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api/v1',
   timeout: 30000,
 });
 

@@ -23,7 +23,23 @@ app.use(helmet());
 const allowedOrigins = config.FRONTEND_URL.split(',').map((url) => url.trim());
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g. mobile apps, curl, server-to-server)
+      if (!origin) return callback(null, true);
+
+      // In development, automatically allow any localhost / 127.0.0.1 port
+      if (config.NODE_ENV === 'development' || config.NODE_ENV === 'test') {
+        if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+          return callback(null, true);
+        }
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(null, false);
+    },
     credentials: true,
   })
 );
