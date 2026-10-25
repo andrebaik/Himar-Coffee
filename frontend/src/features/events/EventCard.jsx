@@ -1,56 +1,67 @@
 import React from 'react';
-import { Calendar, MapPin } from 'lucide-react';
+import { CalendarDays, MapPin } from 'lucide-react';
 import ImageWithFallback from '../../components/ImageWithFallback.jsx';
 import { formatTanggal } from '../../lib/format.js';
+import { getEventImage } from '../../lib/media.js';
 
-export default function EventCard({ event }) {
+export default function EventCard({ event, featured = false, compact = false }) {
   const eventTime = new Date(event.event_date).getTime();
   const isPast = eventTime < Date.now();
 
-  return (
-    <div className="bg-white rounded-2xl border border-[#E7DCCB] overflow-hidden shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between">
-      <div>
-        <div className="relative">
-          <ImageWithFallback
-            src={event.image_url}
-            alt={event.title}
-            aspectRatio="aspect-16/9"
-          />
-          <span
-            className={`absolute top-2.5 right-2.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full shadow-xs ${
-              isPast
-                ? 'bg-gray-500 text-white'
-                : 'bg-[#6F8F72] text-white'
-            }`}
-          >
-            {isPast ? 'Selesai' : 'Mendatang'}
-          </span>
+  if (compact) {
+    return (
+      <article className="grid gap-4 border-b border-[#ded2c1] pb-5 sm:grid-cols-[7rem_1fr] sm:items-start">
+        <div className="border-l-2 border-[#4f6d52] pl-3">
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#4f6d52]">{isPast ? 'Selesai' : 'Mendatang'}</p>
+          <p className="mt-2 text-xs leading-5 text-[#6b625b]">{formatTanggal(event.event_date)}</p>
         </div>
-
-        <div className="p-5">
-          <div className="flex items-center gap-1.5 text-xs text-[#B5532C] font-semibold mb-2">
-            <Calendar className="w-3.5 h-3.5 shrink-0" />
-            <span>{formatTanggal(event.event_date)}</span>
-          </div>
-
-          <h3 className="font-serif font-bold text-lg text-[#2B1B12] mb-2">
-            {event.title}
-          </h3>
-
-          {event.description && (
-            <p className="text-xs text-[#2B1B12]/70 line-clamp-3 leading-relaxed mb-4">
-              {event.description}
+        <div>
+          <h3 className="text-2xl leading-none text-[#281a13]">{event.title}</h3>
+          {event.location && (
+            <p className="mt-3 flex items-center gap-2 text-xs text-[#6b625b]">
+              <MapPin className="h-3.5 w-3.5 text-[#b5532c]" aria-hidden="true" />
+              {event.location}
             </p>
           )}
         </div>
+      </article>
+    );
+  }
+
+  return (
+    <article className={`group overflow-hidden border border-[#ded2c1] bg-[#fffdf8] ${featured ? 'grid md:grid-cols-[1.08fr_0.92fr]' : ''}`}>
+      <div className={`image-frame ${featured ? 'min-h-[20rem] md:min-h-full' : 'aspect-[16/10]'}`}>
+        <ImageWithFallback
+          src={getEventImage(event)}
+          alt={`Visual ${event.title}`}
+          aspectRatio={featured ? 'h-full w-full' : 'h-full w-full'}
+          fallbackLabel="Poster event belum tersedia"
+          className="h-full transition duration-500 group-hover:scale-[1.03]"
+        />
+        <span className="absolute left-4 top-4 bg-[#281a13] px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-[0.12em] text-white">
+          {isPast ? 'Selesai' : 'Mendatang'}
+        </span>
       </div>
 
-      {event.location && (
-        <div className="px-5 py-3 border-t border-[#E7DCCB]/40 bg-[#FAF4EA]/40 flex items-center gap-2 text-xs text-[#2B1B12]/70">
-          <MapPin className="w-3.5 h-3.5 text-[#B5532C] shrink-0" />
-          <span className="truncate">{event.location}</span>
+      <div className={`flex flex-col justify-between gap-8 p-6 ${featured ? 'md:p-10' : ''}`}>
+        <div>
+          <p className="flex items-start gap-2 text-xs font-bold uppercase tracking-[0.1em] text-[#b5532c]">
+            <CalendarDays className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+            {formatTanggal(event.event_date)}
+          </p>
+          <h3 className={`mt-5 leading-[0.98] text-[#281a13] ${featured ? 'text-4xl md:text-5xl' : 'text-2xl'}`}>
+            {event.title}
+          </h3>
+          {event.description && <p className="mt-4 max-w-lg text-sm leading-7 text-[#6b625b]">{event.description}</p>}
         </div>
-      )}
-    </div>
+
+        {event.location && (
+          <p className="flex items-center gap-2 border-t border-[#ded2c1] pt-4 text-xs text-[#6b625b]">
+            <MapPin className="h-4 w-4 text-[#4f6d52]" aria-hidden="true" />
+            {event.location}
+          </p>
+        )}
+      </div>
+    </article>
   );
 }

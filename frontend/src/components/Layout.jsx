@@ -6,11 +6,9 @@ import ChatWidget from '../features/chat/ChatWidget.jsx';
 
 export default function Layout({ children }) {
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF4EA] text-[#2B1B12]">
+    <div className="site-shell flex min-h-screen flex-col text-[#281a13]">
       <Navbar />
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 md:py-8">
-        {children}
-      </main>
+      <main className="flex-1">{children}</main>
       <Footer />
       <CartDrawer />
       <ChatWidget />

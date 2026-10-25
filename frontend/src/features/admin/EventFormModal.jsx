@@ -120,32 +120,34 @@ export default function EventFormModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#281a13]/65 p-0 md:items-center md:p-6" role="presentation">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-xs"
+        className="fixed inset-0"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-[#E7DCCB] max-h-[90vh] flex flex-col z-10 overflow-hidden">
+      <div className="relative z-10 flex max-h-[94dvh] w-full max-w-2xl flex-col overflow-hidden border border-[#ded2c1] bg-[#fffdf8] shadow-[0_24px_70px_rgba(40,26,19,0.22)]" role="dialog" aria-modal="true" aria-labelledby="event-form-title">
         {/* Header */}
-        <div className="p-5 border-b border-[#E7DCCB] bg-[#FAF4EA] flex items-center justify-between">
-          <h2 className="font-serif font-bold text-lg text-[#2B1B12]">
+        <div className="flex items-center justify-between border-b border-[#ded2c1] bg-[#eee5d8] p-5">
+          <h2 id="event-form-title" className="text-3xl leading-none text-[#281a13]">
             {isEditing ? 'Ubah Event' : 'Tambah Event Baru'}
           </h2>
           <button
             onClick={onClose}
-            className="p-1.5 text-[#2B1B12]/60 hover:text-[#2B1B12] rounded-lg cursor-pointer"
+            type="button"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center text-[#6b625b] transition hover:bg-[#fffdf8] hover:text-[#281a13]"
+            aria-label="Tutup formulir event"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Scrollable Form */}
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="flex-1 space-y-5 overflow-y-auto p-5 md:p-7">
           {generalError && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl">
+            <div className="border-l-2 border-[#b5532c] bg-[#fff8f3] p-3 text-sm text-[#6b625b]" role="alert">
               {generalError}
             </div>
           )}

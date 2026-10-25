@@ -2,13 +2,13 @@ import React from 'react';
 
 export function MenuCardSkeleton() {
   return (
-    <div className="bg-white rounded-xl border border-[#E7DCCB] p-4 animate-pulse">
-      <div className="w-full aspect-4/3 bg-[#FAF4EA] rounded-lg mb-3"></div>
-      <div className="h-4 bg-[#E7DCCB] rounded w-3/4 mb-2"></div>
-      <div className="h-3 bg-[#E7DCCB]/60 rounded w-1/2 mb-4"></div>
-      <div className="flex justify-between items-center pt-2 border-t border-[#E7DCCB]/40">
-        <div className="h-4 bg-[#B5532C]/30 rounded w-1/3"></div>
-        <div className="h-8 bg-[#E7DCCB] rounded-lg w-20"></div>
+    <div className="animate-pulse">
+      <div className="aspect-[4/3] border border-[#ded2c1] bg-[#eee5d8]" />
+      <div className="border-b border-[#ded2c1] py-4">
+        <div className="h-3 w-20 bg-[#ded2c1]" />
+        <div className="mt-3 h-7 w-2/3 bg-[#ded2c1]" />
+        <div className="mt-3 h-3 w-full bg-[#ded2c1]/75" />
+        <div className="mt-2 h-3 w-4/5 bg-[#ded2c1]/75" />
       </div>
     </div>
   );
@@ -16,12 +16,14 @@ export function MenuCardSkeleton() {
 
 export function EventCardSkeleton() {
   return (
-    <div className="bg-white rounded-xl border border-[#E7DCCB] p-4 animate-pulse">
-      <div className="w-full aspect-16/9 bg-[#FAF4EA] rounded-lg mb-3"></div>
-      <div className="h-5 bg-[#E7DCCB] rounded w-2/3 mb-2"></div>
-      <div className="h-3 bg-[#E7DCCB]/60 rounded w-1/3 mb-3"></div>
-      <div className="h-3 bg-[#E7DCCB]/40 rounded w-full mb-1"></div>
-      <div className="h-3 bg-[#E7DCCB]/40 rounded w-4/5"></div>
+    <div className="animate-pulse border border-[#ded2c1] bg-[#fffdf8]">
+      <div className="aspect-[16/10] bg-[#eee5d8]" />
+      <div className="space-y-3 p-6">
+        <div className="h-3 w-28 bg-[#ded2c1]" />
+        <div className="h-7 w-4/5 bg-[#ded2c1]" />
+        <div className="h-3 w-full bg-[#ded2c1]/75" />
+        <div className="h-3 w-3/4 bg-[#ded2c1]/75" />
+      </div>
     </div>
   );
 }

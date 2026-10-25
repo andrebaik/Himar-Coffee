@@ -1,146 +1,103 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate, Link } from 'react-router-dom';
-import {
-  Coffee,
-  Calendar,
-  BarChart3,
-  MessageSquare,
-  LogOut,
-  Menu,
-  X,
-  ExternalLink,
-} from 'lucide-react';
+import { Coffee, CalendarDays, BarChart3, MessageSquare, LogOut, Menu, X, ExternalLink } from 'lucide-react';
 import { useAuth } from './AuthProvider.jsx';
 
-export default function AdminLayout({ children, title = 'Panel Admin' }) {
+const navItems = [
+  { name: 'Katalog menu', path: '/admin/menus', icon: Coffee },
+  { name: 'Jadwal event', path: '/admin/events', icon: CalendarDays },
+  { name: 'Dasbor penjualan', path: '/admin/dashboard', icon: BarChart3 },
+  { name: 'Riwayat chat', path: '/admin/chat-logs', icon: MessageSquare },
+];
+
+export default function AdminLayout({ children, title = 'Panel admin' }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') setIsSidebarOpen(false);
+    };
+    document.addEventListener('keydown', closeOnEscape);
+    return () => document.removeEventListener('keydown', closeOnEscape);
+  }, []);
 
   const handleLogout = () => {
     logout();
     navigate('/admin/login');
   };
 
-  const navItems = [
-    { name: 'Katalog Menu', path: '/admin/menus', icon: Coffee },
-    { name: 'Jadwal Event', path: '/admin/events', icon: Calendar },
-    { name: 'Dasbor Penjualan', path: '/admin/dashboard', icon: BarChart3 },
-    { name: 'Riwayat Chat', path: '/admin/chat-logs', icon: MessageSquare },
-  ];
-
   return (
-    <div className="min-h-screen bg-[#FAF4EA] flex flex-col md:flex-row">
-      {/* Mobile Top Header */}
-      <header className="md:hidden bg-[#2B1B12] text-white p-4 flex items-center justify-between sticky top-0 z-40">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-[#B5532C] flex items-center justify-center text-white">
-            <Coffee className="w-4 h-4" />
-          </div>
-          <span className="font-serif font-bold text-base">Himar Admin</span>
+    <div className="min-h-screen bg-[#f7f2e9] text-[#281a13] md:flex">
+      <header className="sticky top-0 z-30 flex min-h-16 items-center justify-between border-b border-[#ded2c1] bg-[#281a13] px-4 text-[#fffdf8] md:hidden">
+        <div>
+          <p className="font-serif text-xl leading-none">Himar Coffee</p>
+          <p className="mt-1 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-[#b9c9af]">Ruang kerja admin</p>
         </div>
-
-        <button
-          onClick={() => setIsSidebarOpen((prev) => !prev)}
-          className="p-1.5 text-white/80 hover:text-white rounded-lg cursor-pointer"
-          aria-label="Toggle navigation menu"
-        >
-          {isSidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        <button type="button" onClick={() => setIsSidebarOpen((open) => !open)} className="inline-flex min-h-11 min-w-11 items-center justify-center border border-[#fffdf8]/25" aria-label={isSidebarOpen ? 'Tutup navigasi admin' : 'Buka navigasi admin'} aria-expanded={isSidebarOpen} aria-controls="admin-sidebar">
+          {isSidebarOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
         </button>
       </header>
 
-      {/* Sidebar Overlay on mobile */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-xs"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
+      {isSidebarOpen && <button type="button" className="fixed inset-0 z-40 bg-[#281a13]/60 md:hidden" onClick={() => setIsSidebarOpen(false)} aria-label="Tutup navigasi admin" />}
 
-      {/* Sidebar */}
-      <aside
-        className={`fixed md:sticky top-0 bottom-0 left-0 w-64 bg-[#2B1B12] text-[#FAF4EA] flex flex-col z-50 transition-transform duration-200 ease-in-out md:translate-x-0 ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        {/* Brand */}
-        <div className="p-6 border-b border-white/10 hidden md:flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#B5532C] flex items-center justify-center text-white shadow-sm">
-            <Coffee className="w-6 h-6" />
-          </div>
-          <div>
-            <h2 className="font-serif font-bold text-lg leading-tight text-white">
-              Himar Coffee
-            </h2>
-            <span className="text-[10px] uppercase tracking-wider text-[#FAF4EA]/60 block">
-              Admin Workspace
+      <aside id="admin-sidebar" className={`fixed inset-y-0 left-0 z-50 flex w-[18rem] flex-col bg-[#281a13] text-[#fffdf8] transition-transform duration-200 md:sticky md:top-0 md:h-screen md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="border-b border-[#fffdf8]/12 px-6 py-7">
+          <Link to="/admin/menus" className="flex items-start gap-3" onClick={() => setIsSidebarOpen(false)}>
+            <span className="flex h-9 w-9 items-center justify-center bg-[#b5532c] font-serif text-lg text-white">H</span>
+            <span>
+              <span className="block font-serif text-xl leading-none">Himar Coffee</span>
+              <span className="mt-2 block text-[0.6rem] font-bold uppercase tracking-[0.16em] text-[#b9c9af]">Ruang kerja admin</span>
             </span>
-          </div>
+          </Link>
         </div>
 
-        {/* Navigation Links */}
-        <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                onClick={() => setIsSidebarOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-medium transition ${
-                    isActive
-                      ? 'bg-[#B5532C] text-white shadow-xs font-semibold'
-                      : 'text-[#FAF4EA]/70 hover:text-white hover:bg-white/5'
-                  }`
-                }
-              >
-                <Icon className="w-4 h-4" />
-                <span>{item.name}</span>
-              </NavLink>
-            );
-          })}
+        <nav className="flex-1 px-4 py-6" aria-label="Navigasi admin">
+          <p className="px-3 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-[#fffdf8]/42">Kelola</p>
+          <div className="mt-3 grid gap-1">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setIsSidebarOpen(false)}
+                  className={({ isActive }) => `flex min-h-12 items-center gap-3 border-l-2 px-3 text-sm transition ${isActive ? 'border-[#b5532c] bg-[#fffdf8]/8 text-[#fffdf8]' : 'border-transparent text-[#fffdf8]/62 hover:border-[#b5532c]/60 hover:text-[#fffdf8]'}`}
+                >
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                  {item.name}
+                </NavLink>
+              );
+            })}
+          </div>
         </nav>
 
-        {/* User Info & Actions */}
-        <div className="p-4 border-t border-white/10 space-y-3">
-          <div className="px-2">
-            <span className="text-[10px] text-[#FAF4EA]/50 block">Masuk sebagai:</span>
-            <span className="text-xs font-medium text-white truncate block">
-              {user?.email || 'admin@himar.com'}
-            </span>
-          </div>
-
-          <div className="pt-2 border-t border-white/5 space-y-1">
-            <Link
-              to="/"
-              target="_blank"
-              className="w-full flex items-center gap-2 px-3 py-2 text-xs text-[#FAF4EA]/70 hover:text-white hover:bg-white/5 rounded-lg transition"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span>Lihat Web Publik</span>
+        <div className="border-t border-[#fffdf8]/12 px-5 py-5">
+          <p className="text-[0.62rem] font-bold uppercase tracking-[0.14em] text-[#fffdf8]/42">Masuk sebagai</p>
+          <p className="mt-2 truncate text-sm text-[#fffdf8]">{user?.email || 'Admin Himar'}</p>
+          <div className="mt-5 grid gap-1">
+            <Link to="/" target="_blank" className="flex min-h-11 items-center gap-2 text-xs text-[#fffdf8]/62 transition hover:text-[#fffdf8]">
+              <ExternalLink className="h-4 w-4" aria-hidden="true" />
+              Lihat web publik
             </Link>
-
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-300 hover:text-red-200 hover:bg-red-900/30 rounded-lg transition cursor-pointer"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Keluar</span>
+            <button type="button" onClick={handleLogout} className="flex min-h-11 items-center gap-2 text-left text-xs text-[#f5c4b5] transition hover:text-white">
+              <LogOut className="h-4 w-4" aria-hidden="true" />
+              Keluar
             </button>
           </div>
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0">
-        {/* Top Header */}
-        <div className="bg-white border-b border-[#E7DCCB] px-6 py-4 hidden md:flex items-center justify-between">
-          <h1 className="font-serif font-bold text-xl text-[#2B1B12]">{title}</h1>
-          <span className="text-xs text-[#2B1B12]/60">Himar Coffee Garut Management</span>
-        </div>
-
-        <div className="p-4 md:p-8 flex-1 overflow-x-auto">{children}</div>
+      <main className="min-w-0 flex-1">
+        <header className="hidden min-h-20 items-center justify-between border-b border-[#ded2c1] bg-[#fffdf8] px-8 md:flex">
+          <div>
+            <p className="text-[0.65rem] font-bold uppercase tracking-[0.15em] text-[#4f6d52]">Himar Coffee Garut</p>
+            <h1 className="mt-2 text-3xl leading-none text-[#281a13]">{title}</h1>
+          </div>
+          <p className="text-xs text-[#6b625b]">Atur hal yang pelanggan lihat di web publik.</p>
+        </header>
+        <div className="p-4 md:p-8">{children}</div>
       </main>
     </div>
   );

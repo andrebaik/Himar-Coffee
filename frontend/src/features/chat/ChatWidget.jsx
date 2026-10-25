@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, Send, Bot, Sparkles } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { MessageSquare, X, Send } from 'lucide-react';
 import { useChat, SUGGESTIONS } from './useChat.js';
 import MessageBubble from './MessageBubble.jsx';
 
@@ -7,171 +7,126 @@ export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef(null);
-  const textareaRef = useRef(null);
-
+  const closeButtonRef = useRef(null);
   const { messages, isLoading, isColdStart, sendMessage, retryLast } = useChat();
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   useEffect(() => {
-    if (isOpen) {
-      scrollToBottom();
-    }
+    if (isOpen) messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading, isOpen]);
 
-  const handleSend = (e) => {
-    if (e) e.preventDefault();
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    closeButtonRef.current?.focus();
+    document.body.classList.add('overlay-open');
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') setIsOpen(false);
+    };
+    document.addEventListener('keydown', closeOnEscape);
+
+    return () => {
+      document.removeEventListener('keydown', closeOnEscape);
+      document.body.classList.remove('overlay-open');
+    };
+  }, [isOpen]);
+
+  const handleSend = (event) => {
+    event?.preventDefault();
     if (!input.trim() || isLoading) return;
     sendMessage(input);
     setInput('');
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
       handleSend();
     }
   };
 
   return (
     <>
-      {/* Floating Toggle Button */}
       <button
         id="himar-chat-toggle"
-        onClick={() => setIsOpen((prev) => !prev)}
-        className="fixed bottom-20 md:bottom-6 right-5 z-40 w-14 h-14 rounded-full bg-[#B5532C] hover:bg-[#a04622] text-white shadow-xl flex items-center justify-center transition-transform hover:scale-105 active:scale-95 cursor-pointer"
-        aria-label={isOpen ? 'Tutup chat asisten' : 'Buka chat asisten'}
+        type="button"
+        onClick={() => setIsOpen((open) => !open)}
+        className="fixed bottom-5 right-5 z-40 inline-flex min-h-14 min-w-14 items-center justify-center border border-[#fffdf8] bg-[#281a13] text-[#fffdf8] shadow-[0_12px_30px_rgba(40,26,19,0.2)] transition hover:bg-[#b5532c] md:bottom-7 md:right-7"
+        aria-label={isOpen ? 'Tutup tanya barista' : 'Buka tanya barista'}
+        aria-expanded={isOpen}
+        aria-controls="barista-panel"
       >
-        {isOpen ? (
-          <X className="w-6 h-6" />
-        ) : (
-          <div className="relative">
-            <MessageSquare className="w-6 h-6" />
-            <span className="absolute -top-1 -right-1 w-3 h-3 bg-[#6F8F72] rounded-full border-2 border-[#B5532C]" />
-          </div>
-        )}
+        {isOpen ? <X className="h-6 w-6" aria-hidden="true" /> : <MessageSquare className="h-6 w-6" aria-hidden="true" />}
       </button>
 
-      {/* Chat Window */}
       {isOpen && (
-        <div className="fixed inset-0 md:inset-auto md:bottom-24 md:right-5 z-50 md:w-[380px] md:h-[560px] bg-[#FAF4EA] md:rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-[#E7DCCB]">
-          {/* Header */}
-          <div className="bg-[#2B1B12] text-[#FAF4EA] p-4 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-[#B5532C] flex items-center justify-center text-white">
-                <Bot className="w-5 h-5" />
-              </div>
+        <div id="barista-panel" className="fixed inset-0 z-50 flex items-end justify-end bg-[#281a13]/65 md:inset-auto md:bottom-24 md:right-7 md:bg-transparent">
+          <section className="flex h-[100dvh] w-full flex-col border border-[#ded2c1] bg-[#f7f2e9] md:h-[min(42rem,calc(100dvh-8rem))] md:w-[25rem] md:shadow-[0_24px_70px_rgba(40,26,19,0.22)]" role="dialog" aria-modal="true" aria-labelledby="barista-title">
+            <header className="flex items-start justify-between bg-[#281a13] px-5 py-5 text-[#fffdf8]">
               <div>
-                <h3 className="font-serif font-bold text-sm leading-tight text-[#FAF4EA]">
-                  Asisten Himar Coffee
-                </h3>
-                <span className="text-[10px] text-[#FAF4EA]/70 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#6F8F72] inline-block" />
-                  Siap menjawab pertanyaanmu
-                </span>
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#b9c9af]">Bantuan di kedai</p>
+                <h2 id="barista-title" className="mt-2 text-3xl leading-none">Tanya barista</h2>
+                <p className="mt-3 text-xs leading-5 text-[#fffdf8]/65">Tanya menu, event, atau cara pesan.</p>
               </div>
+              <button ref={closeButtonRef} type="button" onClick={() => setIsOpen(false)} className="inline-flex min-h-11 min-w-11 items-center justify-center border border-[#fffdf8]/25 text-[#fffdf8] transition hover:bg-[#fffdf8] hover:text-[#281a13]" aria-label="Tutup panel tanya barista">
+                <X className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </header>
+
+            <div aria-live="polite" className="flex-1 overflow-y-auto px-4 py-5 md:px-5">
+              {messages.map((message) => (
+                <MessageBubble key={message.id} message={message} onRetry={retryLast} onClosePanel={() => setIsOpen(false)} />
+              ))}
+
+              {messages.length === 1 && !isLoading && (
+                <div className="mt-5 border-t border-[#ded2c1] pt-4">
+                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#6b625b]">Bisa mulai dari sini</p>
+                  <div className="mt-3 grid gap-2">
+                    {SUGGESTIONS.map((suggestion) => (
+                      <button key={suggestion} type="button" onClick={() => sendMessage(suggestion)} className="min-h-11 border border-[#ded2c1] bg-[#fffdf8] px-3 text-left text-xs leading-5 text-[#281a13] transition hover:border-[#b5532c] hover:text-[#b5532c]">
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {isLoading && (
+                <div className="mt-4 border-l-2 border-[#4f6d52] bg-[#fffdf8] px-4 py-3 text-sm text-[#6b625b]">
+                  <span className="inline-flex items-center gap-1" aria-label="Barista sedang menyiapkan jawaban">
+                    <span className="h-1.5 w-1.5 bg-[#b5532c]" />
+                    <span className="h-1.5 w-1.5 bg-[#b5532c]" />
+                    <span className="h-1.5 w-1.5 bg-[#b5532c]" />
+                  </span>
+                  {isColdStart && <span className="ml-3">Asisten sedang menyiapkan jawaban.</span>}
+                </div>
+              )}
+
+              <div ref={messagesEndRef} />
             </div>
 
-            <button
-              onClick={() => setIsOpen(false)}
-              className="p-1.5 text-[#FAF4EA]/70 hover:text-[#FAF4EA] rounded-lg transition cursor-pointer"
-              aria-label="Tutup panel chat"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Messages Area */}
-          <div
-            aria-live="polite"
-            className="flex-1 overflow-y-auto p-4 space-y-2 bg-[#FAF4EA]"
-          >
-            {messages.map((msg) => (
-              <MessageBubble
-                key={msg.id}
-                message={msg}
-                onRetry={retryLast}
-                onClosePanel={() => setIsOpen(false)}
-              />
-            ))}
-
-            {/* Suggestions Chips (shown under welcome message if only 1 message exists) */}
-            {messages.length === 1 && !isLoading && (
-              <div className="pt-2 pl-9 space-y-1.5">
-                <span className="text-[11px] font-semibold text-[#2B1B12]/60 flex items-center gap-1 mb-2">
-                  <Sparkles className="w-3 h-3 text-[#B5532C]" />
-                  Pertanyaan Populer:
-                </span>
-                <div className="flex flex-col gap-1.5">
-                  {SUGGESTIONS.map((sug, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => sendMessage(sug)}
-                      className="text-left text-xs bg-white hover:bg-[#FAF4EA] border border-[#E7DCCB] hover:border-[#B5532C] text-[#2B1B12] px-3 py-2 rounded-xl transition cursor-pointer shadow-2xs"
-                    >
-                      {sug}
-                    </button>
-                  ))}
+            <footer className="border-t border-[#ded2c1] bg-[#fffdf8] p-4">
+              <form onSubmit={handleSend}>
+                <label htmlFor="barista-message" className="sr-only">Pesan untuk barista</label>
+                <div className="flex items-end gap-2 border border-[#281a13] bg-[#f7f2e9] p-2 focus-within:border-[#b5532c]">
+                  <textarea
+                    id="barista-message"
+                    value={input}
+                    onChange={(event) => setInput(event.target.value.slice(0, 500))}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Tulis pertanyaanmu"
+                    rows={1}
+                    className="max-h-24 min-h-10 flex-1 resize-none bg-transparent px-2 py-2 text-sm text-[#281a13] placeholder:text-[#6b625b]/70 focus:outline-none"
+                  />
+                  <button type="submit" disabled={!input.trim() || isLoading} className="inline-flex min-h-11 min-w-11 items-center justify-center bg-[#b5532c] text-white transition hover:bg-[#8c3f25] disabled:cursor-not-allowed disabled:bg-[#6b625b]" aria-label="Kirim pesan">
+                    <Send className="h-4 w-4" aria-hidden="true" />
+                  </button>
                 </div>
-              </div>
-            )}
-
-            {/* Typing Indicator */}
-            {isLoading && (
-              <div className="flex items-start gap-2 mb-3">
-                <div className="w-7 h-7 rounded-full bg-[#FAF4EA] border border-[#E7DCCB] text-[#B5532C] flex items-center justify-center shrink-0">
-                  <Bot className="w-3.5 h-3.5" />
+                <div className="mt-2 flex justify-between px-1 text-[0.65rem] text-[#6b625b]">
+                  <span>Enter untuk kirim, Shift + Enter untuk baris baru</span>
+                  <span>{input.length}/500</span>
                 </div>
-                <div className="bg-white border border-[#E7DCCB] px-4 py-3 rounded-2xl rounded-tl-xs shadow-xs space-y-1.5">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-[#B5532C] animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-2 h-2 rounded-full bg-[#B5532C] animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-2 h-2 rounded-full bg-[#B5532C] animate-bounce" style={{ animationDelay: '300ms' }} />
-                  </div>
-                  {isColdStart && (
-                    <p className="text-[11px] text-[#2B1B12]/60 animate-fade-in">
-                      Asisten sedang menyiapkan jawaban…
-                    </p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Input Footer */}
-          <div className="p-3 bg-white border-t border-[#E7DCCB] shrink-0">
-            <form onSubmit={handleSend} className="space-y-1.5">
-              <div className="flex items-end gap-2 bg-[#FAF4EA] border border-[#E7DCCB] rounded-2xl p-2 focus-within:border-[#B5532C] focus-within:ring-1 focus-within:ring-[#B5532C] transition">
-                <textarea
-                  ref={textareaRef}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value.slice(0, 500))}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Tanya menu, event, atau pemesanan..."
-                  rows={1}
-                  className="w-full text-xs bg-transparent focus:outline-none resize-none max-h-24 text-[#2B1B12] placeholder-[#2B1B12]/40"
-                />
-
-                <button
-                  type="submit"
-                  disabled={!input.trim() || isLoading}
-                  className="p-2 rounded-xl bg-[#B5532C] hover:bg-[#a04622] disabled:bg-gray-300 text-white transition cursor-pointer shrink-0"
-                  aria-label="Kirim pesan"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              <div className="flex justify-between items-center px-1 text-[10px] text-[#2B1B12]/50">
-                <span>Tekan Enter untuk mengirim</span>
-                <span>{input.length}/500</span>
-              </div>
-            </form>
-          </div>
+              </form>
+            </footer>
+          </section>
         </div>
       )}
     </>

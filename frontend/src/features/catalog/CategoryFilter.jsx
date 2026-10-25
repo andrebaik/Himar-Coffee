@@ -4,20 +4,21 @@ export default function CategoryFilter({ categories = [], selected = '', onSelec
   const allCategories = ['', ...categories];
 
   return (
-    <div className="flex items-center gap-2 overflow-x-auto py-2 no-scrollbar">
-      {allCategories.map((cat) => {
-        const isActive = selected === cat;
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-b border-[#ded2c1] pb-4" aria-label="Filter kategori menu">
+      {allCategories.map((category) => {
+        const isActive = selected === category;
         return (
           <button
-            key={cat || 'all'}
-            onClick={() => onSelect(cat)}
-            className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-colors cursor-pointer border ${
-              isActive
-                ? 'bg-[#B5532C] text-white border-[#B5532C] shadow-xs'
-                : 'bg-white text-[#2B1B12]/80 border-[#E7DCCB] hover:border-[#B5532C]/40 hover:bg-[#FAF4EA]'
+            key={category || 'all'}
+            type="button"
+            onClick={() => onSelect(category)}
+            className={`relative inline-flex min-h-11 items-center text-sm transition ${
+              isActive ? 'font-semibold text-[#b5532c]' : 'text-[#6b625b] hover:text-[#281a13]'
             }`}
+            aria-pressed={isActive}
           >
-            {cat || 'Semua Menu'}
+            {category || 'Semua menu'}
+            {isActive && <span className="absolute -bottom-[1px] left-0 h-0.5 w-full bg-[#b5532c]" aria-hidden="true" />}
           </button>
         );
       })}

@@ -1,51 +1,30 @@
 import React from 'react';
-import { ExternalLink, BarChart3, AlertCircle } from 'lucide-react';
+import { BarChart3, ExternalLink } from 'lucide-react';
 import AdminLayout from '../../features/admin/AdminLayout.jsx';
 
 export default function AdminDashboard() {
   const dashboardUrl = import.meta.env.VITE_DASHBOARD_URL;
 
   return (
-    <AdminLayout title="Dasbor Penjualan">
-      <div className="space-y-4">
+    <AdminLayout title="Dasbor penjualan">
+      <div className="space-y-8">
+        <div className="border-b border-[#ded2c1] pb-6">
+          <p className="max-w-2xl text-sm leading-7 text-[#6b625b]">Buka ringkasan penjualan dan pola menu yang membantu kamu menyiapkan operasional kedai.</p>
+        </div>
+
         {dashboardUrl ? (
-          <div className="bg-white rounded-3xl border border-[#E7DCCB] overflow-hidden shadow-xs flex flex-col h-[750px]">
-            <div className="p-3.5 bg-[#FAF4EA] border-b border-[#E7DCCB] flex items-center justify-between">
-              <span className="text-xs text-[#2B1B12]/70 font-medium">
-                Streamlit Business Intelligence Dashboard
-              </span>
-              <a
-                href={dashboardUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs font-semibold text-[#B5532C] hover:text-[#a04622] inline-flex items-center gap-1"
-              >
-                <span>Buka di tab baru</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
+          <div className="overflow-hidden border border-[#ded2c1] bg-[#fffdf8]">
+            <div className="flex flex-col gap-4 border-b border-[#ded2c1] bg-[#eee5d8] px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-[#4f6d52]">Data penjualan</p><p className="mt-1 text-sm text-[#6b625b]">Dashboard Streamlit terhubung</p></div>
+              <a href={dashboardUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 text-xs font-bold uppercase tracking-[0.08em] text-[#b5532c] transition hover:text-[#8c3f25]"><ExternalLink className="h-4 w-4" aria-hidden="true" /> Buka di tab baru</a>
             </div>
-            <iframe
-              src={dashboardUrl}
-              title="Dasbor Penjualan Himar Coffee"
-              loading="lazy"
-              className="w-full flex-1 border-0"
-            />
+            <iframe src={dashboardUrl} title="Dasbor penjualan Himar Coffee" loading="lazy" className="h-[min(75vh,52rem)] w-full border-0" />
           </div>
         ) : (
-          <div className="bg-white rounded-3xl border border-[#E7DCCB] p-12 text-center max-w-lg mx-auto shadow-xs my-8 space-y-4">
-            <div className="w-16 h-16 bg-[#FAF4EA] text-[#B5532C] rounded-2xl flex items-center justify-center mx-auto border border-[#E7DCCB]">
-              <BarChart3 className="w-8 h-8" />
-            </div>
-            <h3 className="font-serif font-bold text-xl text-[#2B1B12]">
-              Dasbor Belum Dikonfigurasi
-            </h3>
-            <p className="text-xs text-[#2B1B12]/70 leading-relaxed">
-              Dasbor visualisasi penjualan sedang dikembangkan menggunakan Streamlit. Setelah siap dan URL tersedia, set variabel lingkungan{' '}
-              <code className="bg-[#FAF4EA] px-2 py-0.5 rounded text-[#B5532C] font-mono text-[11px]">
-                VITE_DASHBOARD_URL
-              </code>{' '}
-              untuk menampilkan grafik penjualan langsung di sini.
-            </p>
+          <div className="mx-auto max-w-xl border-y border-[#ded2c1] py-16 text-center">
+            <BarChart3 className="mx-auto h-8 w-8 text-[#b5532c]" aria-hidden="true" />
+            <h2 className="mt-5 text-3xl leading-none">Dasbor belum dikonfigurasi</h2>
+            <p className="mt-4 text-sm leading-7 text-[#6b625b]">Isi <code className="bg-[#eee5d8] px-1.5 py-0.5 text-xs text-[#b5532c]">VITE_DASHBOARD_URL</code> lalu build ulang frontend untuk menampilkan dashboard Streamlit di sini.</p>
           </div>
         )}
       </div>

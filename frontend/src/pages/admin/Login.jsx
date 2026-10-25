@@ -1,141 +1,90 @@
 import React, { useState } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
-import { Coffee, Eye, EyeOff, Lock, Mail, ArrowLeft } from 'lucide-react';
+import { useNavigate, Navigate, Link } from 'react-router-dom';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import { useAuth } from '../../features/admin/AuthProvider.jsx';
 
 export default function Login() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // If already logged in, redirect
-  if (user) {
-    return <Navigate to="/admin/menus" replace />;
-  }
+  if (user) return <Navigate to="/admin/menus" replace />;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setErrorMessage('');
 
-    // Client-side validation
-    if (!email.trim()) {
-      setErrorMessage('Email wajib diisi.');
-      return;
-    }
-    if (!/\S+@\S+\.\S+/.test(email.trim())) {
-      setErrorMessage('Format email tidak valid.');
-      return;
-    }
-    if (!password) {
-      setErrorMessage('Kata sandi wajib diisi.');
-      return;
-    }
+    if (!email.trim()) return setErrorMessage('Email wajib diisi.');
+    if (!/\S+@\S+\.\S+/.test(email.trim())) return setErrorMessage('Format email tidak valid.');
+    if (!password) return setErrorMessage('Kata sandi wajib diisi.');
 
     setIsSubmitting(true);
     const result = await login(email.trim(), password);
     setIsSubmitting(false);
 
-    if (result.success) {
-      navigate('/admin/menus');
-    } else {
-      setErrorMessage(result.error);
-    }
+    if (result.success) navigate('/admin/menus');
+    else setErrorMessage(result.error);
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF4EA] flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl border border-[#E7DCCB] p-8 md:p-10">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-[#B5532C] text-white flex items-center justify-center mx-auto mb-4 shadow-sm">
-            <Coffee className="w-7 h-7" />
-          </div>
-          <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#2B1B12]">
-            Portal Admin
-          </h1>
-          <p className="text-xs text-[#2B1B12]/60 mt-1">
-            Himar Coffee Garut — Masuk untuk mengelola menu dan event
-          </p>
+    <div className="grid min-h-screen bg-[#f7f2e9] lg:grid-cols-[0.9fr_1.1fr]">
+      <div className="hidden bg-[#281a13] p-10 text-[#fffdf8] lg:flex lg:flex-col lg:justify-between lg:p-16">
+        <div>
+          <Link to="/" className="inline-flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center bg-[#b5532c] font-serif text-xl">H</span>
+            <span>
+              <span className="block font-serif text-2xl leading-none">Himar Coffee</span>
+              <span className="mt-2 block text-[0.62rem] font-bold uppercase tracking-[0.16em] text-[#b9c9af]">Garut</span>
+            </span>
+          </Link>
         </div>
+        <div className="max-w-md">
+          <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#b9c9af]">Ruang kerja admin</p>
+          <h1 className="mt-5 text-6xl leading-[0.95]">Atur apa yang pelanggan temukan di Himar.</h1>
+          <p className="mt-6 text-sm leading-7 text-[#fffdf8]/65">Kelola menu, jadwal event, dan percakapan pelanggan dari satu tempat.</p>
+        </div>
+        <p className="text-xs text-[#fffdf8]/42">Gunakan akun admin yang sudah terdaftar di Supabase Auth.</p>
+      </div>
 
-        {/* Error Alert */}
-        {errorMessage && (
-          <div className="mb-6 p-3.5 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700">
-            {errorMessage}
+      <div className="flex items-center justify-center px-5 py-12 md:px-10">
+        <div className="w-full max-w-md">
+          <Link to="/" className="text-xs font-bold uppercase tracking-[0.12em] text-[#6b625b] transition hover:text-[#b5532c]">Kembali ke web publik</Link>
+          <div className="mt-12">
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#4f6d52]">Masuk</p>
+            <h2 className="mt-3 text-5xl leading-[0.95] text-[#281a13]">Selamat datang kembali.</h2>
+            <p className="mt-5 text-sm leading-7 text-[#6b625b]">Masuk untuk memperbarui menu dan jadwal yang tampil di web Himar.</p>
           </div>
-        )}
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-[#2B1B12] mb-1.5">
-              Email
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2B1B12]/40" />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="nama@email.com"
-                className="w-full pl-10 pr-4 py-2.5 bg-[#FAF4EA]/40 border border-[#E7DCCB] rounded-xl text-xs text-[#2B1B12] focus:outline-none focus:ring-1 focus:ring-[#B5532C] focus:border-[#B5532C] transition"
-              />
+          {errorMessage && <div className="mt-8 border-l-2 border-[#b5532c] bg-[#fff8f3] px-4 py-3 text-sm leading-6 text-[#6b625b]" role="alert">{errorMessage}</div>}
+
+          <form onSubmit={handleSubmit} className="mt-8 grid gap-5">
+            <div>
+              <label htmlFor="admin-email" className="block text-xs font-bold uppercase tracking-[0.12em] text-[#281a13]">Email</label>
+              <div className="relative mt-3">
+                <Mail className="pointer-events-none absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#b5532c]" aria-hidden="true" />
+                <input id="admin-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="nama@email.com" className="min-h-12 w-full border-b border-[#281a13] bg-transparent pl-8 pr-2 text-sm text-[#281a13] placeholder:text-[#6b625b]/70 focus:border-[#b5532c] focus:outline-none" autoComplete="email" />
+              </div>
             </div>
-          </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-[#2B1B12] mb-1.5">
-              Kata Sandi
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2B1B12]/40" />
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full pl-10 pr-10 py-2.5 bg-[#FAF4EA]/40 border border-[#E7DCCB] rounded-xl text-xs text-[#2B1B12] focus:outline-none focus:ring-1 focus:ring-[#B5532C] focus:border-[#B5532C] transition"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#2B1B12]/40 hover:text-[#2B1B12] transition cursor-pointer"
-                aria-label={showPassword ? 'Sembunyikan sandi' : 'Tampilkan sandi'}
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+            <div>
+              <label htmlFor="admin-password" className="block text-xs font-bold uppercase tracking-[0.12em] text-[#281a13]">Kata sandi</label>
+              <div className="relative mt-3">
+                <Lock className="pointer-events-none absolute left-0 top-1/2 h-4 w-4 -translate-y-1/2 text-[#b5532c]" aria-hidden="true" />
+                <input id="admin-password" type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Masukkan kata sandi" className="min-h-12 w-full border-b border-[#281a13] bg-transparent pl-8 pr-12 text-sm text-[#281a13] placeholder:text-[#6b625b]/70 focus:border-[#b5532c] focus:outline-none" autoComplete="current-password" />
+                <button type="button" onClick={() => setShowPassword((visible) => !visible)} className="absolute right-0 top-1/2 inline-flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center text-[#6b625b] transition hover:text-[#b5532c]" aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}>
+                  {showPassword ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+                </button>
+              </div>
             </div>
-          </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full mt-2 bg-[#B5532C] hover:bg-[#a04622] disabled:bg-gray-400 text-white font-medium py-3 rounded-xl text-xs shadow-sm transition cursor-pointer flex items-center justify-center gap-2"
-          >
-            {isSubmitting ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span>Memproses...</span>
-              </>
-            ) : (
-              <span>Masuk ke Dasbor</span>
-            )}
-          </button>
-        </form>
-
-        <div className="mt-8 text-center">
-          <a
-            href="/"
-            className="text-xs text-[#2B1B12]/60 hover:text-[#B5532C] inline-flex items-center gap-1.5 transition"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Kembali ke Beranda Pelanggan
-          </a>
+            <button type="submit" disabled={isSubmitting} className="mt-3 inline-flex min-h-12 items-center justify-center gap-2 bg-[#b5532c] px-5 text-xs font-bold uppercase tracking-[0.1em] text-white transition hover:bg-[#8c3f25] disabled:cursor-wait disabled:bg-[#6b625b]">
+              {isSubmitting ? 'Memeriksa akses' : 'Masuk ke ruang kerja'}
+            </button>
+          </form>
         </div>
       </div>
     </div>

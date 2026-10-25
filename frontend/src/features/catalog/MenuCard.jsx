@@ -1,78 +1,59 @@
 import React from 'react';
 import ImageWithFallback from '../../components/ImageWithFallback.jsx';
 import { formatRupiah } from '../../lib/format.js';
+import { getMenuImage } from '../../lib/media.js';
 import { Plus } from 'lucide-react';
 
-export default function MenuCard({ menu, onSelect }) {
+export default function MenuCard({ menu, onSelect, featured = false }) {
   const isAvailable = menu.is_available !== false;
 
   return (
-    <div
-      onClick={() => isAvailable && onSelect(menu)}
-      className={`group bg-white rounded-2xl border border-[#E7DCCB] overflow-hidden shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between ${
-        isAvailable ? 'cursor-pointer hover:border-[#B5532C]/40' : 'opacity-60 cursor-not-allowed'
-      }`}
-    >
-      <div>
-        {/* Image 4:3 ratio */}
-        <div className="relative overflow-hidden">
+    <article className={`group ${featured ? 'sm:col-span-2 lg:col-span-1' : ''}`}>
+      <div className={`block w-full text-left ${isAvailable ? '' : 'opacity-55'}`}>
+        <div className="image-frame aspect-[4/3] border border-[#ded2c1]">
           <ImageWithFallback
-            src={menu.image_url}
-            alt={menu.name}
-            aspectRatio="aspect-4/3"
-            className="group-hover:scale-103 transition-transform duration-300"
+            src={getMenuImage(menu)}
+            alt={`Visual ${menu.name}`}
+            aspectRatio="h-full w-full"
+            fallbackLabel="Foto menu belum tersedia"
+            className="h-full transition duration-500 group-hover:scale-[1.03]"
           />
           {menu.is_featured && (
-            <span className="absolute top-2.5 left-2.5 bg-[#B5532C] text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-xs">
+            <span className="absolute left-3 top-3 bg-[#b5532c] px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-[0.12em] text-white">
               Unggulan
             </span>
           )}
           {!isAvailable && (
-            <span className="absolute top-2.5 right-2.5 bg-gray-700 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-xs">
+            <span className="absolute right-3 top-3 bg-[#281a13] px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-[0.12em] text-white">
               Habis
             </span>
           )}
         </div>
 
-        {/* Content */}
-        <div className="p-4">
-          <span className="text-[11px] uppercase tracking-wider text-[#6F8F72] font-semibold">
-            {menu.category}
-          </span>
-          <h3 className="font-serif font-bold text-base text-[#2B1B12] mt-0.5 group-hover:text-[#B5532C] transition-colors line-clamp-1">
-            {menu.name}
-          </h3>
-          {menu.description && (
-            <p className="text-xs text-[#2B1B12]/70 mt-1 line-clamp-2 leading-relaxed">
-              {menu.description}
-            </p>
-          )}
+        <div className="border-b border-[#ded2c1] py-4">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-[#4f6d52]">{menu.category}</p>
+              <h3 className="mt-2 text-2xl leading-none text-[#281a13] transition group-hover:text-[#b5532c]">{menu.name}</h3>
+            </div>
+            <span className="pt-1 text-sm font-semibold text-[#b5532c]">{formatRupiah(menu.price)}</span>
+          </div>
+          {menu.description && <p className="mt-3 line-clamp-2 max-w-md text-sm leading-6 text-[#6b625b]">{menu.description}</p>}
         </div>
       </div>
 
-      {/* Footer / Price & action */}
-      <div className="px-4 pb-4 pt-1 flex items-center justify-between border-t border-[#E7DCCB]/40">
-        <div>
-          <span className="text-[10px] text-[#2B1B12]/50 block">Mulai dari</span>
-          <span className="font-bold text-sm text-[#B5532C]">
-            {formatRupiah(menu.price)}
+      {isAvailable && (
+        <button
+          type="button"
+          onClick={() => onSelect(menu)}
+          className="mt-3 inline-flex min-h-11 items-center gap-2 text-xs font-bold uppercase tracking-[0.1em] text-[#281a13] transition hover:text-[#b5532c]"
+        >
+          <span className="flex h-7 w-7 items-center justify-center border border-[#b5532c] text-[#b5532c] transition group-hover:bg-[#b5532c] group-hover:text-white">
+            <Plus className="h-4 w-4" aria-hidden="true" />
           </span>
-        </div>
-
-        {isAvailable && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onSelect(menu);
-            }}
-            className="inline-flex items-center gap-1 bg-[#FAF4EA] hover:bg-[#B5532C] text-[#B5532C] hover:text-white border border-[#E7DCCB] hover:border-[#B5532C] text-xs font-medium px-2.5 py-1.5 rounded-lg transition cursor-pointer"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Pesan
-          </button>
-        )}
-      </div>
-    </div>
+          Tambah ke pesanan
+        </button>
+      )}
+    </article>
   );
 }

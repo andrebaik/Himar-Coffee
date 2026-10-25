@@ -10,7 +10,7 @@ load_dotenv()
 # Page configuration
 st.set_page_config(
     page_title="Himar Coffee - Dasbor Penjualan",
-    page_icon="☕",
+    page_icon="H",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -18,32 +18,56 @@ st.set_page_config(
 # Custom Styling to match Himar Coffee brand
 st.markdown("""
 <style>
-    .reportview-container {
-        background: #FAF4EA;
+    :root {
+        --paper: #f7f2e9;
+        --surface: #fffdf8;
+        --ink: #281a13;
+        --muted: #6b625b;
+        --accent: #b5532c;
+        --sage: #6f8f72;
+        --line: #ded2c1;
+    }
+    .stApp, [data-testid="stAppViewContainer"] {
+        background: var(--paper);
+        color: var(--ink);
+    }
+    [data-testid="stSidebar"] {
+        background: #281a13;
+    }
+    [data-testid="stSidebar"] * {
+        color: #fffdf8 !important;
     }
     .metric-card {
-        background-color: #FFFFFF;
-        border: 1px solid #E7DCCB;
-        border-radius: 16px;
-        padding: 18px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        background-color: var(--surface);
+        border-top: 2px solid var(--accent);
+        border-bottom: 1px solid var(--line);
+        padding: 18px 0;
     }
     .metric-title {
-        color: #2B1B12;
-        font-size: 13px;
-        font-weight: 600;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 1.2px;
     }
     .metric-value {
-        color: #B5532C;
-        font-size: 26px;
+        color: var(--ink);
+        font-size: 25px;
         font-weight: 700;
-        margin-top: 4px;
+        line-height: 1.15;
+        margin-top: 6px;
     }
     .stSelectbox label, .stDateInput label {
-        color: #2B1B12 !important;
-        font-weight: 600 !important;
+        color: var(--ink) !important;
+        font-weight: 700 !important;
+    }
+    h1, h2, h3 {
+        color: var(--ink) !important;
+        letter-spacing: -0.04em;
+    }
+    [data-testid="stMetric"] {
+        background: transparent;
+        border: 0;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -91,7 +115,7 @@ def load_sales_data():
         return pd.DataFrame()
 
 # Header
-st.title("☕ Himar Coffee Garut — Dasbor Penjualan")
+st.title("Himar Coffee Garut. Dasbor Penjualan")
 st.markdown("Analitik performa penjualan, tren pendapatan, dan produk terlaris.")
 
 # Load Data
@@ -101,7 +125,7 @@ if df_raw.empty:
     st.info("Belum ada data penjualan tercatat di sistem.")
 else:
     # Sidebar Filters
-    st.sidebar.header("🔍 Filter Data")
+    st.sidebar.header("Filter Data")
 
     # Date range filter
     min_date = df_raw["transaction_date"].min().date()
@@ -134,7 +158,7 @@ else:
     total_transactions = len(df)
     avg_order_value = total_revenue / total_transactions if total_transactions > 0 else 0
 
-    best_seller = "—"
+    best_seller = "Belum ada"
     if not df.empty:
         top_item = df.groupby("menu_name")["quantity"].sum().sort_values(ascending=False)
         if not top_item.empty:
@@ -180,7 +204,7 @@ else:
     chart_col1, chart_col2 = st.columns([2, 1])
 
     with chart_col1:
-        st.subheader("📈 Tren Pendapatan Harian")
+        st.subheader("Tren Pendapatan Harian")
         if not df.empty:
             df_daily = df.copy()
             df_daily["date"] = df_daily["transaction_date"].dt.date
@@ -201,7 +225,7 @@ else:
             st.plotly_chart(fig_trend, use_container_width=True)
 
     with chart_col2:
-        st.subheader("🥧 Penjualan per Kategori")
+        st.subheader("Penjualan per Kategori")
         if not df.empty:
             cat_summary = df.groupby("category")["total_amount"].sum().reset_index()
             fig_pie = px.pie(
@@ -218,7 +242,7 @@ else:
             st.plotly_chart(fig_pie, use_container_width=True)
 
     # Top Menu items
-    st.subheader("🏆 5 Menu Paling Banyak Dipesan")
+    st.subheader("5 Menu Paling Banyak Dipesan")
     if not df.empty:
         top_menus = (
             df.groupby("menu_name")["quantity"]
@@ -243,7 +267,7 @@ else:
         st.plotly_chart(fig_bar, use_container_width=True)
 
     # Data Table
-    with st.expander("📋 Lihat Riwayat Transaksi Lengkap"):
+    with st.expander("Lihat Riwayat Transaksi Lengkap"):
         df_display = df[["transaction_date", "menu_name", "category", "unit_price", "quantity", "total_amount"]].copy()
         df_display["transaction_date"] = df_display["transaction_date"].dt.strftime("%d-%m-%Y %H:%M")
         df_display.columns = ["Waktu Transaksi", "Nama Menu", "Kategori", "Harga Satuan", "Kuantitas", "Total Harga"]

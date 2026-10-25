@@ -15,7 +15,7 @@ const getOrCreateSessionId = () => {
 const INITIAL_MESSAGE = {
   id: 'welcome',
   sender: 'bot',
-  text: 'Halo! Selamat datang di Himar Coffee Garut ☕ Ada yang bisa kubantu seputar menu, jadwal event, atau cara pemesanan?',
+  text: 'Halo, selamat datang di Himar Coffee Garut. Ada yang bisa kubantu seputar menu, jadwal event, atau cara pemesanan?',
   time: new Date(),
   actions: [],
 };
