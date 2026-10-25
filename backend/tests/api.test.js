@@ -180,3 +180,140 @@ describe('Not Found Routing', () => {
     expect(res.body.error.code).toBe('NOT_FOUND');
   });
 });
+
+describe('Orders WhatsApp Link Endpoint', () => {
+  it('POST /api/v1/orders/whatsapp-link calculates total on server and returns wa.me URL', async () => {
+    // Get existing menu from DB
+    const menusRes = await request(app).get('/api/v1/menus');
+    const lostSheep = menusRes.body.data.find((m) => m.name === 'The Lost Sheep');
+    expect(lostSheep).toBeDefined();
+
+    const res = await request(app)
+      .post('/api/v1/orders/whatsapp-link')
+      .send({
+        items: [
+          {
+            menu_id: lostSheep.id,
+            quantity: 2,
+            variant: 'Iced',
+          },
+        ],
+        note: 'Gula sedikit saja',
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.url).toContain('https://wa.me/62895620019593');
+    expect(res.body.data.text).toContain('The Lost Sheep (Iced) x2');
+    expect(res.body.data.text).toContain('Gula sedikit saja');
+    // Price: (25000 + 3000) * 2 = 56000
+    expect(res.body.data.total).toBe(56000);
+  });
+
+  it('rejects invalid variant name with 400 VALIDATION_ERROR', async () => {
+    const menusRes = await request(app).get('/api/v1/menus');
+    const lostSheep = menusRes.body.data.find((m) => m.name === 'The Lost Sheep');
+
+    const res = await request(app)
+      .post('/api/v1/orders/whatsapp-link')
+      .send({
+        items: [
+          {
+            menu_id: lostSheep.id,
+            quantity: 1,
+            variant: 'SuperSpicyNonExistent',
+          },
+        ],
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.code).toBe('VALIDATION_ERROR');
+    expect(res.body.error.message).toContain('SuperSpicyNonExistent');
+  });
+
+  it('rejects empty items array with 400 VALIDATION_ERROR', async () => {
+    const res = await request(app)
+      .post('/api/v1/orders/whatsapp-link')
+      .send({ items: [] });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.code).toBe('VALIDATION_ERROR');
+  });
+});
+
+describe('Chat Endpoint & Mock AI', () => {
+  it('rejects empty message with 400 VALIDATION_ERROR', async () => {
+    const res = await request(app)
+      .post('/api/v1/chat')
+      .send({
+        session_id: 'session123456',
+        message: '',
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  it('rejects message exceeding 500 characters with 400 VALIDATION_ERROR', async () => {
+    const res = await request(app)
+      .post('/api/v1/chat')
+      .send({
+        session_id: 'session123456',
+        message: 'a'.repeat(501),
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  it('returns tanya_menu intent with menu action for menu questions', async () => {
+    const res = await request(app)
+      .post('/api/v1/chat')
+      .send({
+        session_id: 'session123456',
+        message: 'Bisa minta rekomendasi kopi atau menu favorit?',
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.intent).toBe('tanya_menu');
+    expect(res.body.data.reply).toBeDefined();
+    expect(res.body.data.actions).toEqual([
+      { type: 'link', label: 'Lihat menu', path: '/menu' },
+    ]);
+  });
+
+  it('returns pemesanan intent with WhatsApp action for order questions', async () => {
+    const res = await request(app)
+      .post('/api/v1/chat')
+      .send({
+        session_id: 'session123456',
+        message: 'Gimana cara order kopi di sini ya?',
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.intent).toBe('pemesanan');
+    expect(res.body.data.actions[0].type).toBe('whatsapp');
+    expect(res.body.data.actions[0].url).toContain('https://wa.me/62895620019593');
+  });
+
+  it('returns di_luar_konteks with empty actions for unrelated questions', async () => {
+    const res = await request(app)
+      .post('/api/v1/chat')
+      .send({
+        session_id: 'session123456',
+        message: 'Siapa presiden pertama Indonesia?',
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.intent).toBe('di_luar_konteks');
+    expect(res.body.data.actions).toEqual([]);
+    expect(res.body.data.reply).toContain('Maaf');
+  });
+});
