@@ -4,7 +4,7 @@ import { existsSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createClient } from '@supabase/supabase-js';
-import { realMenus, dummyEvents } from './real-menu-data.js';
+import { realMenus, datasetEvents } from './real-menu-data.js';
 import { assertSupabaseHost } from './preflight.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -35,7 +35,7 @@ const seed = async () => {
   const FORCE_IMAGES = process.env.FORCE_IMAGES === '1';
 
   const images = await loadImageMap();
-  console.log('🌱 Memulai seed menu asli Himar Coffee...\n');
+  console.log('🌱 Memulai seed dataset Himar Coffee...\n');
 
   let insertedMenus = 0;
   let updatedMenus = 0;
@@ -109,12 +109,12 @@ const seed = async () => {
     console.log(`  ✅ Menu "${menu.name}" ditambahkan${photoNote}.`);
   }
 
-  console.log('\n📅 Seed event contoh...\n');
+  console.log('\n📅 Seed event...\n');
 
   let insertedEvents = 0;
   let skippedEvents = 0;
 
-  for (const event of dummyEvents) {
+  for (const event of datasetEvents) {
     const { data: existing } = await supabase
       .from('events')
       .select('id')
@@ -148,7 +148,7 @@ const seed = async () => {
     `\n🎉 Selesai: ${parts.join(', ')}; ` +
       `${insertedEvents} event baru, ${skippedEvents} dilewati.`
   );
-  console.log('⚠️  Harga masih estimasi — periksa dan sesuaikan lewat halaman admin.');
+  console.log('ℹ️  Data mengikuti Dataset Himar Coffee.xlsx; ubah harga via halaman admin bila perlu.');
 };
 
 seed().catch((err) => {

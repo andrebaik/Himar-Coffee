@@ -43,10 +43,10 @@ def get_catalog_context() -> str:
     else:
         # Fallback knowledge base if backend is not yet reached
         lines.append("\n[Daftar Menu Default]")
-        lines.append("- Klepon Milky Coffee (UNGGULAN, Coffee Based): Rp28.000 | Varian: Hot, Iced - Kopi susu cita rasa klepon")
-        lines.append("- Spanish Latte (UNGGULAN, Coffee Based): Rp28.000 | Varian: Hot, Iced - Latte susu kental manis")
-        lines.append("- Americano (Coffee Based): Rp18.000 | Varian: Hot, Iced")
-        lines.append("- Matcha Milky (Milky Based): Rp28.000 | Varian: Iced")
+        lines.append("- The Lost Sheep (UNGGULAN, Signature Coffee): Rp35.000 | Varian: Cold - Kopi dengan ekstrak buah beri")
+        lines.append("- Merry Gloss (UNGGULAN, Signature Coffee): Rp35.000 | Varian: Cold - Kopi dengan nuansa bourbon")
+        lines.append("- Americano (Coffee Based): Rp16.000 | Varian: Hot, Cold")
+        lines.append("- Matcha Milky (Milky Based): Rp23.000 | Varian: Hot, Cold")
 
     if _events_cache:
         lines.append("\n[Jadwal Event Mendatang]")

@@ -10,7 +10,9 @@
     "upload:images": "node scripts/upload_menu_images.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "photos:upscale": "node scripts/upscale_photos.js"
+    "photos:upscale": "node scripts/upscale_photos.js",
+    "data:generate": "node scripts/generate_dataset_data.js",
+    "data:import": "node scripts/import_dataset.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.0",
@@ -26,6 +28,7 @@
   },
   "devDependencies": {
     "supertest": "^7.0.0",
-    "vitest": "^3.0.0"
+    "vitest": "^3.0.0",
+    "xlsx": "^0.18.5"
   }
 }

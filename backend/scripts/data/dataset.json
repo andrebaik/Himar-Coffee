@@ -1,0 +1,1019 @@
+{
+  "meta": {
+    "source": "Dataset Himar Coffee.xlsx",
+    "generated_at": "2026-11-26T12:46:26.696Z",
+    "menus": 74,
+    "events": 5,
+    "sales": 5792,
+    "menus_without_photo": 12
+  },
+  "menus": [
+    {
+      "name": "The Lost Sheep",
+      "description": "Perpaduan 60% kopi full-bodied dengan tingkat keasaman cerah dan 40% ekstrak buah beri. Sensasi rasa segar dengan hasil akhir menyerupai karakter wine.",
+      "category": "Signature Coffee",
+      "price": 35000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": true,
+      "is_available": true,
+      "photo": null
+    },
+    {
+      "name": "Merry Gloss",
+      "description": "Paduan 70% kopi kuat dengan 30% nuansa bourbon. Aromatik karamel, vanila, dan kayu.",
+      "category": "Signature Coffee",
+      "price": 35000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": true,
+      "is_available": true,
+      "photo": null
+    },
+    {
+      "name": "Dark Terror",
+      "description": "Kombinasi presisi 55% kopi pekat pahit intens dan 45% madu alami.",
+      "category": "Signature Coffee",
+      "price": 32000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": true,
+      "is_available": true,
+      "photo": null
+    },
+    {
+      "name": "Jegeur Bageur",
+      "description": "Minuman Cold Brew menggunakan Kopi Papandayan distok chiller 42 jam (Notes: Caramel, Chocolate, Nuts).",
+      "category": "Signature Coffee",
+      "price": 32000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": true,
+      "is_available": true,
+      "photo": null
+    },
+    {
+      "name": "Brew Warden",
+      "description": "Konsentrat Kopi yang terbuat dari Kopi Gayo.",
+      "category": "Signature Coffee",
+      "price": 250000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": true,
+      "is_available": true,
+      "photo": null
+    },
+    {
+      "name": "Espresso",
+      "description": "Menggunakan Kopi Arabika, disajikan panas dengan crema pekat.",
+      "category": "Coffee Based",
+      "price": 12000,
+      "variants": [
+        {
+          "name": "Hot",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Coffe Based/Espresso.png"
+    },
+    {
+      "name": "Espresso on the Rock",
+      "description": "Espresso yang ditambahkan Es batu.",
+      "category": "Coffee Based",
+      "price": 12000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Coffe Based/Espresso On The Rock.png"
+    },
+    {
+      "name": "Americano",
+      "description": "Single/Double Shot Espresso ditambahkan air. Disajikan panas atau dingin.",
+      "category": "Coffee Based",
+      "price": 16000,
+      "variants": [
+        {
+          "name": "Hot",
+          "extra_price": 0
+        },
+        {
+          "name": "Cold",
+          "extra_price": 2000
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Coffe Based/Americano.png"
+    },
+    {
+      "name": "Cappuccino",
+      "description": "Kopi Arabika espresso dipadukan steam susu dengan foam tebal.",
+      "category": "Coffee Based",
+      "price": 23000,
+      "variants": [
+        {
+          "name": "Hot",
+          "extra_price": 0
+        },
+        {
+          "name": "Cold",
+          "extra_price": 2000
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Coffe Based/Cappuccino.png"
+    },
+    {
+      "name": "Moccacino",
+      "description": "Espresso dipadukan dengan Chocolate dan Steam Milk.",
+      "category": "Coffee Based",
+      "price": 23000,
+      "variants": [
+        {
+          "name": "Hot",
+          "extra_price": 0
+        },
+        {
+          "name": "Cold",
+          "extra_price": 2000
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Coffe Based/Moccacino.png"
+    },
+    {
+      "name": "Coffee Latte",
+      "description": "Espresso dicampur Steam Susu lapisan foam tipis.",
+      "category": "Coffee Based",
+      "price": 23000,
+      "variants": [
+        {
+          "name": "Hot",
+          "extra_price": 0
+        },
+        {
+          "name": "Cold",
+          "extra_price": 2000
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Coffe Based/Coffe Latte.png"
+    },
+    {
+      "name": "Spanish Latte",
+      "description": "Espresso dipadukan dengan Susu, Creamer dan Condensed Milk.",
+      "category": "Coffee Based",
+      "price": 23000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Coffe Based/Spanish Latte.png"
+    },
+    {
+      "name": "Vanilla Latte",
+      "description": "Espresso dipadukan dengan Susu dan Vanilla.",
+      "category": "Coffee Based",
+      "price": 23000,
+      "variants": [
+        {
+          "name": "Hot",
+          "extra_price": 0
+        },
+        {
+          "name": "Cold",
+          "extra_price": 2000
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Coffe Based/Vanilla Latte.png"
+    },
+    {
+      "name": "Hazelnut Latte",
+      "description": "Espresso dipadukan dengan Susu dan Hazelnut.",
+      "category": "Coffee Based",
+      "price": 23000,
+      "variants": [
+        {
+          "name": "Hot",
+          "extra_price": 0
+        },
+        {
+          "name": "Cold",
+          "extra_price": 2000
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Coffe Based/Hazelnut Latte.png"
+    },
+    {
+      "name": "Butterscotch Latte",
+      "description": "Espresso dipadukan dengan Susu dan Butterscotch.",
+      "category": "Coffee Based",
+      "price": 23000,
+      "variants": [
+        {
+          "name": "Hot",
+          "extra_price": 0
+        },
+        {
+          "name": "Cold",
+          "extra_price": 2000
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Coffe Based/Butterscotch Latte.png"
+    },
+    {
+      "name": "Klepon Milky Coffee",
+      "description": "Espresso dipadukan dengan Susu, Pandan dan Brown Sugar.",
+      "category": "Coffee Based",
+      "price": 25000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Coffe Based/Klepon Milky Coffe.png"
+    },
+    {
+      "name": "Pandan Milky Coffee",
+      "description": "Espresso dipadukan dengan Susu dan Pandan.",
+      "category": "Coffee Based",
+      "price": 25000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Coffe Based/Pandan Milky Coffe.png"
+    },
+    {
+      "name": "Avocado Milky Coffee",
+      "description": "Espresso dipadukan dengan Susu dan Pandan/Avocado.",
+      "category": "Coffee Based",
+      "price": 25000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Coffe Based/Avocado Milky Coffe.png"
+    },
+    {
+      "name": "Ilamuna",
+      "description": "Double Shot Espresso dipadukan dengan Lemon dan Jahe.",
+      "category": "Mocktail Coffee",
+      "price": 25000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Moktail Coffe/Ilamuna.png"
+    },
+    {
+      "name": "Brown Peach",
+      "description": "Double Shot Espresso dipadukan dengan Peach dan Brown Sugar.",
+      "category": "Mocktail Coffee",
+      "price": 25000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Moktail Coffe/Brown Peach.png"
+    },
+    {
+      "name": "Frosted Assault",
+      "description": "Double Shot Espresso dipadukan dengan Mint dan Brown Sugar.",
+      "category": "Mocktail Coffee",
+      "price": 25000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Moktail Coffe/Frosted Assault.png"
+    },
+    {
+      "name": "Strawberry Milky",
+      "description": "Minuman Strawberry dipadukan dengan Susu, Creamer, dan Condensed Milk.",
+      "category": "Milky Based",
+      "price": 25000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Milky Based/Strawberry Milky.png"
+    },
+    {
+      "name": "Choco Milky",
+      "description": "Minuman Chocolate dipadukan dengan Susu, Creamer, dan Condensed Milk.",
+      "category": "Milky Based",
+      "price": 23000,
+      "variants": [
+        {
+          "name": "Hot",
+          "extra_price": 0
+        },
+        {
+          "name": "Cold",
+          "extra_price": 2000
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Milky Based/Choco Milky.png"
+    },
+    {
+      "name": "Vanilla Milky",
+      "description": "Minuman Vanilla dipadukan dengan Susu, Creamer, dan Condensed Milk.",
+      "category": "Milky Based",
+      "price": 23000,
+      "variants": [
+        {
+          "name": "Hot",
+          "extra_price": 0
+        },
+        {
+          "name": "Cold",
+          "extra_price": 2000
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Milky Based/Vanilla Milky.png"
+    },
+    {
+      "name": "Matcha Milky",
+      "description": "Minuman Matcha dipadukan dengan Susu, Creamer, dan Condensed Milk.",
+      "category": "Milky Based",
+      "price": 23000,
+      "variants": [
+        {
+          "name": "Hot",
+          "extra_price": 0
+        },
+        {
+          "name": "Cold",
+          "extra_price": 2000
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Milky Based/Matcha Milky.png"
+    },
+    {
+      "name": "Avocado Milky",
+      "description": "Minuman Avocado dipadukan dengan Susu, Creamer, dan Condensed Milk.",
+      "category": "Milky Based",
+      "price": 23000,
+      "variants": [
+        {
+          "name": "Hot",
+          "extra_price": 0
+        },
+        {
+          "name": "Cold",
+          "extra_price": 2000
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Milky Based/Avocado Milky.png"
+    },
+    {
+      "name": "In the Sky",
+      "description": "Minuman Soda dipadukan dengan Lychee, Lemon dan Lime.",
+      "category": "Mixed Drink",
+      "price": 25000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Mixed Drink/In The Sky.png"
+    },
+    {
+      "name": "Virgin Mojito",
+      "description": "Minuman Soda dipadukan dengan Lemon dan Mint.",
+      "category": "Mixed Drink",
+      "price": 25000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Mixed Drink/Virgin Mojito.png"
+    },
+    {
+      "name": "Peach Mojito",
+      "description": "Minuman Soda dipadukan dengan Peach, Lemon dan Mint.",
+      "category": "Mixed Drink",
+      "price": 25000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Mixed Drink/Peach Mojito.png"
+    },
+    {
+      "name": "Lychee Mojito",
+      "description": "Minuman Soda dipadukan dengan Peach, Lemon dan Mint.",
+      "category": "Mixed Drink",
+      "price": 25000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Mixed Drink/Lychee Mojito.png"
+    },
+    {
+      "name": "Strawberry Mojito",
+      "description": "Minuman Soda dipadukan dengan Strawberry, Lemon dan Mint.",
+      "category": "Mixed Drink",
+      "price": 25000,
+      "variants": [
+        {
+          "name": "Cold",
+          "extra_price": 0
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Mixed Drink/Strawberry Mojito.png"
+    },
+    {
+      "name": "Regular Tea",
+      "description": "Perpaduan Black Tea dan Camomile Tea.",
+      "category": "Tea Based",
+      "price": 7000,
+      "variants": [
+        {
+          "name": "Hot",
+          "extra_price": 0
+        },
+        {
+          "name": "Cold",
+          "extra_price": 2000
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Tea Based/Reguler Tea.png"
+    },
+    {
+      "name": "Peach Tea",
+      "description": "Perpaduan Black Tea, Camomile Tea dan Peach.",
+      "category": "Tea Based",
+      "price": 16000,
+      "variants": [
+        {
+          "name": "Hot",
+          "extra_price": 0
+        },
+        {
+          "name": "Cold",
+          "extra_price": 2000
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Tea Based/Peach Tea.png"
+    },
+    {
+      "name": "Lychee Tea",
+      "description": "Perpaduan Black Tea, Camomile Tea dan Lychee.",
+      "category": "Tea Based",
+      "price": 16000,
+      "variants": [
+        {
+          "name": "Hot",
+          "extra_price": 0
+        },
+        {
+          "name": "Cold",
+          "extra_price": 2000
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Tea Based/Lychee Tea.png"
+    },
+    {
+      "name": "Peppermint Tea",
+      "description": "Perpaduan Black Tea, Camomile Tea dan Mint.",
+      "category": "Tea Based",
+      "price": 16000,
+      "variants": [
+        {
+          "name": "Hot",
+          "extra_price": 0
+        },
+        {
+          "name": "Cold",
+          "extra_price": 2000
+        }
+      ],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Tea Based/Peppermint Tea.png"
+    },
+    {
+      "name": "Nasi Goreng Himar",
+      "description": "Nasi goreng bumbu signature gurih manis + mix vegetable, sosis, telur mata sapi, kerupuk, acar.",
+      "category": "Main Course",
+      "price": 25000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Main Course/Nasi Goreng Himar.png"
+    },
+    {
+      "name": "Nasi Goreng Butter",
+      "description": "Nasi goreng aroma butter + mix vegetable, sosis, telur mata sapi, kerupuk, acar.",
+      "category": "Main Course",
+      "price": 25000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Main Course/Nasi Goreng Butter.png"
+    },
+    {
+      "name": "Nasi Goreng Rempah",
+      "description": "Nasi goreng bumbu rempah + daging ayam cincang dan telur mata sapi.",
+      "category": "Main Course",
+      "price": 28000,
+      "variants": [],
+      "is_featured": true,
+      "is_available": true,
+      "photo": "Main Course/Nasi Goreng Rempah.png"
+    },
+    {
+      "name": "Nasi Goreng Seafood",
+      "description": "Nasi goreng bumbu seafood + udang, cumi, mix vegetable, telur mata sapi.",
+      "category": "Main Course",
+      "price": 30000,
+      "variants": [],
+      "is_featured": true,
+      "is_available": true,
+      "photo": "Main Course/Nasi Goreng Seafood.png"
+    },
+    {
+      "name": "Nasi Ayam Goreng Serundeng",
+      "description": "Ayam goreng empuk tabur serundeng + nasi, lalapan, sambal pedas.",
+      "category": "Main Course",
+      "price": 30000,
+      "variants": [],
+      "is_featured": true,
+      "is_available": true,
+      "photo": "Main Course/Nasi Ayam Goreng Serundeng.png"
+    },
+    {
+      "name": "Nasi Ayam Bakar Rempah",
+      "description": "Ayam bakar bumbu rempah manis gurih + nasi, lalapan, sambal kecap pedas.",
+      "category": "Main Course",
+      "price": 32000,
+      "variants": [],
+      "is_featured": true,
+      "is_available": true,
+      "photo": "Main Course/Nasi Ayam Bakar Rempah.png"
+    },
+    {
+      "name": "Nasi Ayam Barbeque Telur Mata Sapi",
+      "description": "Ayam fillet smoky + saus barbeque, telur mata sapi, nasi, buah ceri.",
+      "category": "Main Course",
+      "price": 28000,
+      "variants": [],
+      "is_featured": true,
+      "is_available": true,
+      "photo": "Main Course/Nasi Ayam Barbeque Telur Mata Sapi.png"
+    },
+    {
+      "name": "Nasi Ayam Ketumbar Sambal Kecap",
+      "description": "Ayam bumbu ketumbar + sambal kecap pedas manis.",
+      "category": "Main Course",
+      "price": 26000,
+      "variants": [],
+      "is_featured": true,
+      "is_available": true,
+      "photo": "Main Course/Nasi Ayam Ketumbar Sambal Kecap.png"
+    },
+    {
+      "name": "Nasi Telur Barendo Sambal Matah",
+      "description": "Telur barendo renyah + nasi aroma daun jeruk, sambal matah.",
+      "category": "Main Course",
+      "price": 18000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Main Course/Nasi Telur Barendo Sambal Matah.png"
+    },
+    {
+      "name": "Nasi Kulit Bumbu Sambal Goreng",
+      "description": "Kulit ayam krispi bumbu sambal goreng + nasi aroma daun jeruk.",
+      "category": "Main Course",
+      "price": 20000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Main Course/Nasi Kulit Bumbu Sambal Goreng.png"
+    },
+    {
+      "name": "Bakmi Asin/Manis",
+      "description": "Bakmi kenyal + topping ayam cincang, pangsit krispi, kuah kaldu, pakcoy, pangsit basah.",
+      "category": "Main Course",
+      "price": 25000,
+      "variants": [],
+      "is_featured": true,
+      "is_available": true,
+      "photo": "Main Course/Bakmi AsinManis.png"
+    },
+    {
+      "name": "Bakmi Spesial",
+      "description": "Bakmi kenyal + ayam cincang, bakso, pangsit, kuah kaldu terpisah.",
+      "category": "Main Course",
+      "price": 35000,
+      "variants": [],
+      "is_featured": true,
+      "is_available": true,
+      "photo": "Main Course/Bakmi Spesial.png"
+    },
+    {
+      "name": "Mie Tek-Tek",
+      "description": "Mie kuah khas Himar + telur, pakcoy, ayam cincang, tomat, bawang goreng, bawang daun.",
+      "category": "Main Course",
+      "price": 20000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Main Course/Mie Tek-Tek.png"
+    },
+    {
+      "name": "Mie Goreng Himar",
+      "description": "Mie goreng bumbu khas + telur mata sapi, sosis, sayuran, keripik pangsit.",
+      "category": "Main Course",
+      "price": 22000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Main Course/Mie Goreng Himar.png"
+    },
+    {
+      "name": "Bakso Aci",
+      "description": "Bakso aci + bakso sapi berurat, tahu, pangsit kuah gurih, jeruk limau.",
+      "category": "Main Course",
+      "price": 18000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Main Course/Bakso Aci.png"
+    },
+    {
+      "name": "Sharing Platter",
+      "description": "Perpaduan kentang goreng, nugget ayam, sosis goreng.",
+      "category": "Appetizer",
+      "price": 30000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Appetizer/Sharing Platter.png"
+    },
+    {
+      "name": "Chicken Strips",
+      "description": "Ayam fillet panir + kentang goreng, mix vegetable, saus barbeque.",
+      "category": "Appetizer",
+      "price": 28000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Appetizer/Chicken Strips.png"
+    },
+    {
+      "name": "Chicken Tortilla",
+      "description": "Tortilla panggang isi ayam, keju, mozzarella + saus mayo wijen.",
+      "category": "Appetizer",
+      "price": 30000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Appetizer/Chicken Tortilla.png"
+    },
+    {
+      "name": "Chicken Wings",
+      "description": "Sayap ayam dimarinasi digoreng kering tabur bumbu minyak wijen.",
+      "category": "Appetizer",
+      "price": 25000,
+      "variants": [],
+      "is_featured": true,
+      "is_available": true,
+      "photo": "Appetizer/Chicken Wings.png"
+    },
+    {
+      "name": "Pangsit Tulang Rangu",
+      "description": "Pangsit goreng krispi isi ayam dan tulang rangu + sambal chilli oil.",
+      "category": "Appetizer",
+      "price": 20000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Appetizer/Pangsit Tulang Rangu.png"
+    },
+    {
+      "name": "Pangsit Basah",
+      "description": "Pangsit lembut isi daging gurih + minyak bawang, chilli oil, ayam cincang.",
+      "category": "Appetizer",
+      "price": 20000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Appetizer/Pangsit Basah.png"
+    },
+    {
+      "name": "Corn Ribs",
+      "description": "Potongan jagung goreng + bumbu gurih, taburan keju, saus wijen.",
+      "category": "Light Bites",
+      "price": 19000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Light Bites/Corn Ribs.png"
+    },
+    {
+      "name": "French Fries",
+      "description": "Kentang goreng pilihan + bumbu gurih & parsley segar.",
+      "category": "Light Bites",
+      "price": 20000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Light Bites/French Fries.png"
+    },
+    {
+      "name": "Cireng Saus Chilli Oil",
+      "description": "Cireng renyah kenyal + sambal chilli oil.",
+      "category": "Light Bites",
+      "price": 10000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Light Bites/Cireng Saus Chilli Oil.png"
+    },
+    {
+      "name": "Mini Croissant",
+      "description": "Pastry mini berlapis renyah aroma butter.",
+      "category": "Sweet Bites",
+      "price": 9000,
+      "variants": [],
+      "is_featured": true,
+      "is_available": true,
+      "photo": "Sweet Bites/Mini Croissant.png"
+    },
+    {
+      "name": "Croissant",
+      "description": "Pastry berlapis renyah aroma butter.",
+      "category": "Sweet Bites",
+      "price": 18000,
+      "variants": [],
+      "is_featured": true,
+      "is_available": true,
+      "photo": "Sweet Bites/Croissant.png"
+    },
+    {
+      "name": "Pain au Chocolat",
+      "description": "Pastry renyah isi cokelat lumer.",
+      "category": "Sweet Bites",
+      "price": 22000,
+      "variants": [],
+      "is_featured": true,
+      "is_available": true,
+      "photo": "Sweet Bites/Pain Au Chocolat.png"
+    },
+    {
+      "name": "Roti Bakar Cokelat",
+      "description": "Roti bakar + isian cokelat lumer dan taburan biskuit.",
+      "category": "Sweet Bites",
+      "price": 18000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Sweet Bites/Roti Bakar Cokelat.png"
+    },
+    {
+      "name": "Roti Bakar Keju",
+      "description": "Roti bakar + selai keju, parutan keju, susu kental manis.",
+      "category": "Sweet Bites",
+      "price": 18000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Sweet Bites/Roti Bakar Keju.png"
+    },
+    {
+      "name": "Roti Bakar Cokelat-Keju",
+      "description": "Roti bakar + cokelat lumer, keju, taburan biskuit.",
+      "category": "Sweet Bites",
+      "price": 18000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Sweet Bites/Roti Bakar Cokelat Keju.png"
+    },
+    {
+      "name": "Donat",
+      "description": "Cincin empuk + topping modern.",
+      "category": "Sweet Bites",
+      "price": 8000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": "Sweet Bites/Donat.png"
+    },
+    {
+      "name": "Pisang Goreng",
+      "description": "Pisang goreng + keju parut dan saus karamel.",
+      "category": "Sweet Bites",
+      "price": 17000,
+      "variants": [],
+      "is_featured": true,
+      "is_available": true,
+      "photo": "Sweet Bites/Pisang Goreng.png"
+    },
+    {
+      "name": "Nasi",
+      "description": "Tambahan Nasi.",
+      "category": "Additional",
+      "price": 5000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": null
+    },
+    {
+      "name": "Telur",
+      "description": "Tambahan Telur.",
+      "category": "Additional",
+      "price": 5000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": null
+    },
+    {
+      "name": "Bakso",
+      "description": "Tambahan Bakso.",
+      "category": "Additional",
+      "price": 10000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": null
+    },
+    {
+      "name": "Katsu",
+      "description": "Tambahan Katsu.",
+      "category": "Additional",
+      "price": 10000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": null
+    },
+    {
+      "name": "Air Mineral",
+      "description": "Air Mineral Botol/Gelas.",
+      "category": "Additional",
+      "price": 5000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": null
+    },
+    {
+      "name": "Ice Cube",
+      "description": "Tambahan Es Batu.",
+      "category": "Additional",
+      "price": 2000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": null
+    },
+    {
+      "name": "Ice Bucket",
+      "description": "Tambahan Es Wadah Bucket.",
+      "category": "Additional",
+      "price": 5000,
+      "variants": [],
+      "is_featured": false,
+      "is_available": true,
+      "photo": null
+    }
+  ],
+  "events": [
+    {
+      "title": "Live Music",
+      "description": "Penampilan musik akustik untuk pengunjung Himar Coffee. Harga tiket: Rp25.000. Kuota 80 orang, sisa 46 tiket.",
+      "event_date": "2026-11-21T19:00:00+07:00",
+      "location": "Himar Coffee Garut"
+    },
+    {
+      "title": "Coffee Workshop",
+      "description": "Workshop pengenalan kopi dan teknik penyeduhan dasar. Harga tiket: Rp50.000. Kuota 30 orang, sisa 12 tiket.",
+      "event_date": "2026-11-28T14:00:00+07:00",
+      "location": "Himar Coffee Garut"
+    },
+    {
+      "title": "Community Gathering",
+      "description": "Kegiatan berkumpul dan networking komunitas lokal. Harga tiket: Rp15.000. Kuota 60 orang, sisa 38 tiket.",
+      "event_date": "2026-12-05T16:00:00+07:00",
+      "location": "Himar Coffee Garut"
+    },
+    {
+      "title": "Nobar",
+      "description": "Acara nonton bareng bersama pengunjung Himar Coffee. Harga tiket: Rp20.000. Kuota 70 orang, sisa 19 tiket.",
+      "event_date": "2026-12-12T19:00:00+07:00",
+      "location": "Himar Coffee Garut"
+    },
+    {
+      "title": "Promo Weekend",
+      "description": "Program promo menu pilihan selama akhir pekan. Kuota 100 orang, sisa 100 tiket.",
+      "event_date": "2026-12-19T10:00:00+07:00",
+      "location": "Himar Coffee Garut"
+    }
+  ]
+}

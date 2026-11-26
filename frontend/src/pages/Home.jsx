@@ -62,7 +62,7 @@ export default function Home() {
   }, []);
 
   const featuredPair = useMemo(() => featuredMenus.slice(0, 2), [featuredMenus]);
-  const supportingMenus = useMemo(() => featuredMenus.slice(2), [featuredMenus]);
+  const supportingMenus = useMemo(() => featuredMenus.slice(2, 8), [featuredMenus]);
 
   const openChat = () => {
     document.getElementById('himar-chat-toggle')?.click();
@@ -180,13 +180,17 @@ export default function Home() {
             <h2 className="mt-4 max-w-sm text-4xl leading-[0.98] md:text-5xl">Pilih sesuai suasana.</h2>
           </div>
           <nav className="grid divide-y divide-[#281a13]/15 border-y border-[#281a13]/15" aria-label="Kategori menu">
-            {['Kopi', 'Non-Kopi', 'Makanan'].map((category) => (
+            {[
+              { label: 'Signature', category: 'Signature Coffee' },
+              { label: 'Coffee Based', category: 'Coffee Based' },
+              { label: 'Makanan', category: 'Main Course' },
+            ].map(({ label, category }) => (
               <Link
                 key={category}
                 to={`/menu?category=${encodeURIComponent(category)}`}
                 className="flex min-h-16 items-center justify-between text-2xl text-[#281a13] transition hover:pl-3 hover:text-[#b5532c] md:text-3xl"
               >
-                <span>{category}</span>
+                <span>{label}</span>
                 <span className="text-sm text-[#6b625b]">Lihat pilihan</span>
               </Link>
             ))}

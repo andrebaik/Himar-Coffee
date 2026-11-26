@@ -79,10 +79,10 @@ export const getMockReply = async (message) => {
         );
         reply += '\n' + lines.join('\n') + '\n\nSilakan cek menu lengkap kami untuk melihat seluruh varian!';
       } else {
-        reply += '\n1. Klepon Milky Coffee - Rp28.000\n2. Spanish Latte - Rp28.000\n\nSilakan cek menu lengkap kami!';
+        reply += '\n1. The Lost Sheep - Rp35.000\n2. Merry Gloss - Rp35.000\n\nSilakan cek menu lengkap kami!';
       }
     } catch {
-      reply += '\n1. Klepon Milky Coffee - Rp28.000\n2. Spanish Latte - Rp28.000';
+      reply += '\n1. The Lost Sheep - Rp35.000\n2. Merry Gloss - Rp35.000';
     }
 
     return {

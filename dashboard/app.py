@@ -92,9 +92,9 @@ def load_sales_data():
         st.warning("Konfigurasi SUPABASE_URL dan SUPABASE_KEY tidak ditemukan. Menampilkan data simulasi.")
         # Fallback dummy data
         data = [
-            {"menu_name": "The Lost Sheep", "category": "Kopi", "unit_price": 25000, "quantity": 3, "total_amount": 75000, "transaction_date": "2024-10-20T10:00:00Z"},
-            {"menu_name": "Merry Gloss", "category": "Kopi", "unit_price": 28000, "quantity": 2, "total_amount": 56000, "transaction_date": "2024-10-21T11:30:00Z"},
-            {"menu_name": "Matcha Latte", "category": "Non-Kopi", "unit_price": 30000, "quantity": 1, "total_amount": 30000, "transaction_date": "2024-10-22T14:15:00Z"},
+            {"menu_name": "The Lost Sheep", "category": "Signature Coffee", "unit_price": 35000, "quantity": 3, "total_amount": 105000, "transaction_date": "2024-10-20T10:00:00Z"},
+            {"menu_name": "Merry Gloss", "category": "Signature Coffee", "unit_price": 35000, "quantity": 2, "total_amount": 70000, "transaction_date": "2024-10-21T11:30:00Z"},
+            {"menu_name": "Matcha Milky", "category": "Milky Based", "unit_price": 23000, "quantity": 1, "total_amount": 23000, "transaction_date": "2024-10-22T14:15:00Z"},
         ]
         df = pd.DataFrame(data)
         df["transaction_date"] = pd.to_datetime(df["transaction_date"])
@@ -103,7 +103,7 @@ def load_sales_data():
     try:
         from supabase import create_client
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-        response = supabase.table("sales").select("*").order("transaction_date", desc=True).limit(1000).execute()
+        response = supabase.table("sales").select("*").order("transaction_date", desc=True).limit(10000).execute()
         rows = response.data or []
         if not rows:
             return pd.DataFrame()

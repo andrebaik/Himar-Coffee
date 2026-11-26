@@ -134,12 +134,11 @@ curl "http://localhost:4000/api/v1/menus?featured=true"
     {
       "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
       "name": "The Lost Sheep",
-      "description": "Signature coffee blend dengan rasa karamel dan cokelat",
-      "price": 28000,
-      "category": "Kopi",
+      "description": "Kopi dengan ekstrak buah beri, aroma dan rasa segar",
+      "price": 35000,
+      "category": "Signature Coffee",
       "variants": [
-        { "name": "Hot", "extra_price": 0 },
-        { "name": "Iced", "extra_price": 3000 }
+        { "name": "Cold", "extra_price": 0 }
       ],
       "image_url": "https://xxx.supabase.co/storage/v1/object/public/menu-images/lost-sheep.jpg",
       "is_featured": true,
@@ -423,7 +422,7 @@ curl -X POST http://localhost:4000/api/v1/orders/whatsapp-link \
   -H "Content-Type: application/json" \
   -d '{
     "items": [
-      { "menu_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890", "quantity": 2, "variant": "Iced" },
+      { "menu_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890", "quantity": 2, "variant": "Cold" },
       { "menu_id": "c3d4e5f6-a7b8-9012-cdef-123456789012", "quantity": 1 }
     ],
     "note": "Tidak pakai gula"
@@ -437,8 +436,8 @@ curl -X POST http://localhost:4000/api/v1/orders/whatsapp-link \
   "success": true,
   "data": {
     "url": "https://wa.me/628123456789?text=Halo%20Himar%20Coffee%21%0ASaya%20ingin%20pesan%3A%0A...",
-    "text": "Halo Himar Coffee!\nSaya ingin pesan:\n1. The Lost Sheep (Iced) x2 — Rp62.000\n2. Merry Gloss x1 — Rp25.000\n\nTotal: Rp87.000\n\nCatatan: Tidak pakai gula\n\nTerima kasih!",
-    "total": 87000
+    "text": "Halo Himar Coffee!\nSaya ingin pesan:\n1. The Lost Sheep (Cold) x2 — Rp70.000\n2. Merry Gloss x1 — Rp35.000\n\nTotal: Rp105.000\n\nCatatan: Tidak pakai gula\n\nTerima kasih!",
+    "total": 105000
   }
 }
 ```

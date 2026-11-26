@@ -185,17 +185,17 @@ describe('Orders WhatsApp Link Endpoint', () => {
   it('POST /api/v1/orders/whatsapp-link calculates total on server and returns wa.me URL', async () => {
     // Get existing menu from DB
     const menusRes = await request(app).get('/api/v1/menus');
-    const klepon = menusRes.body.data.find((m) => m.name === 'Klepon Milky Coffee');
-    expect(klepon).toBeDefined();
+    const americano = menusRes.body.data.find((m) => m.name === 'Americano');
+    expect(americano).toBeDefined();
 
     const res = await request(app)
       .post('/api/v1/orders/whatsapp-link')
       .send({
         items: [
           {
-            menu_id: klepon.id,
+            menu_id: americano.id,
             quantity: 2,
-            variant: 'Iced',
+            variant: 'Cold',
           },
         ],
         note: 'Gula sedikit saja',
@@ -204,22 +204,22 @@ describe('Orders WhatsApp Link Endpoint', () => {
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data.url).toContain('https://wa.me/62895620019593');
-    expect(res.body.data.text).toContain('Klepon Milky Coffee (Iced) x2');
+    expect(res.body.data.text).toContain('Americano (Cold) x2');
     expect(res.body.data.text).toContain('Gula sedikit saja');
-    // Price: (28000 + 3000) * 2 = 62000
-    expect(res.body.data.total).toBe(62000);
+    // Price: (16000 + 2000) * 2 = 36000
+    expect(res.body.data.total).toBe(36000);
   });
 
   it('rejects invalid variant name with 400 VALIDATION_ERROR', async () => {
     const menusRes = await request(app).get('/api/v1/menus');
-    const klepon = menusRes.body.data.find((m) => m.name === 'Klepon Milky Coffee');
+    const americano = menusRes.body.data.find((m) => m.name === 'Americano');
 
     const res = await request(app)
       .post('/api/v1/orders/whatsapp-link')
       .send({
         items: [
           {
-            menu_id: klepon.id,
+            menu_id: americano.id,
             quantity: 1,
             variant: 'SuperSpicyNonExistent',
           },

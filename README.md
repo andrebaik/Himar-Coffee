@@ -231,30 +231,38 @@ npm install
 #    tidak burem saat tampil di kartu menu.
 npm run photos:upscale
 
-# 2) Unggah 62 foto produk asli ke Supabase Storage (butuh koneksi internet)
+# 2) Ubah "Dataset Himar Coffee.xlsx" menjadi snapshot JSON (menu, event,
+#    transaksi). Path Excel bisa diberikan sebagai argumen.
+npm run data:generate -- "/path/Dataset Himar Coffee.xlsx"
+
+# 3) Unggah foto produk ke Supabase Storage (butuh koneksi internet)
 #    Sumber foto: folder product-photos/ di root repo (tidak ikut Git).
 #    Foto dikonversi ke WebP (~12 KB/foto) lalu diunggah ke bucket menu-images.
 #    Hasil mapping URL disimpan di scripts/image-map.json.
 npm run upload:images
 
-# 3) Seed menu asli + event contoh
-npm run seed
+# 4) Import penuh dataset ke Supabase: 74 menu, 11 kategori, 5 event,
+#    dan 5.792 transaksi penjualan.
+#    ⚠️  Script ini MENGHAPUS isi tabel menus, events, dan sales lebih dulu.
+npm run data:import -- --yes
 
 # Bila foto diganti, naikkan versi agar cache CDN/browser tidak menyajikan
 # gambar lama, lalu paksa URL di database ikut diperbarui:
 #   IMAGE_VERSION=3 npm run upload:images
 #   FORCE_IMAGES=1 npm run seed
 
+# Alternatif: seed 74 menu dataset tanpa menghapus (idempoten) + event
+npm run seed
+
 # Alternatif tanpa foto/Supabase Storage: seed data dummy lama
 npm run seed:dummy
-
-# Jalankan seed simulasi transaksi penjualan untuk dasbor
-node scripts/seed_sales.js
 ```
 
-> ⚠️ **Harga pada seed menu asli masih estimasi.** Periksa dan sesuaikan harga
-> lewat halaman admin (`/admin/menus`) sebelum demo. Nama menu diambil dari
-> foto produk di `product-photos/`.
+> ℹ️ **Sumber data:** harga, deskripsi, varian, kategori, event, dan riwayat
+> penjualan diambil dari `Dataset Himar Coffee.xlsx` (lembar `Produk`,
+> `Varian_Harga`, `Kategori`, `Event`, `Transaksi`). Dua lembar tidak
+> diimpor karena tidak ada tabelnya di skema: `Stok_Produk` dan `Riwayat_Stok`
+> (stok) serta `Admin` (akun admin dibuat lewat Supabase Auth).
 
 ### 2. Menjalankan Backend Express
 ```bash
@@ -366,7 +374,7 @@ npm run build
 1. **Harga Tidak Pernah Dipercaya dari Klien:** Pada pemesanan via WhatsApp (`POST /api/v1/orders/whatsapp-link`), harga total selalu dihitung ulang di server berdasarkan data di database untuk mencegah manipulasi harga dari sisi pengguna.
 2. **Fallback Chatbot Deterministik:** Jika layanan LLM mengalami kegagalan koneksi (*rate limited* atau kuota habis), sistem secara otomatis mengaktifkan *fallback keyword classifier* sehingga chatbot tetap mampu melayani pertanyaan pelanggan tanpa henti.
 3. **Pemberitahuan Blokir Pop-up Manual:** Karena sejumlah peramban seluler secara *default* memblokir pembukaan tab otomatis melalui skrip, keranjang pesanan dilengkapi pendeteksi jendela pop-up dan menyediakan tombol manual *"Buka WhatsApp Manual"* yang andal.
-4. **Menu Asli Menggantikan Data Dummy:** Seed default kini memakai 62 menu asli Himar Coffee yang diekstrak dari foto produk, diunggah ke Supabase Storage. Harga masih estimasi (mudah diubah lewat admin). Dua menu unggulan dipilih dari menu asli — **Klepon Milky Coffee** dan **Spanish Latte** — menggantikan nama dummy *The Lost Sheep* dan *Merry Gloss* dari spesifikasi awal. Seed dummy lama tetap tersedia via `npm run seed:dummy`.
+4. **Data Asli dari Dataset Excel:** Seed default kini memakai `Dataset Himar Coffee.xlsx` — **74 menu**, 11 kategori (termasuk *Signature Coffee* dan *Additional*), 5 event, serta **5.792 transaksi penjualan** (01-10-2025 s/d 30-09-2026, total Rp249.534.550) untuk mengisi dasbor. Harga dan varian mengikuti lembar `Varian_Harga`, sehingga varian bernama `Hot`/`Cold` (bukan lagi `Iced`). Lima menu signature (termasuk **The Lost Sheep** dan **Merry Gloss**) menjadi menu unggulan di beranda. Seed dummy lama tetap tersedia via `npm run seed:dummy`.
 
 ### Batasan yang Diketahui:
 - **Free Tier Cold Start:** Pada layanan hosting tier gratis (seperti Render), server dapat masuk ke mode *sleep* bila tidak ada aktivitas, mengakibatkan waktu tunggu 30-50 detik pada request pertama.
