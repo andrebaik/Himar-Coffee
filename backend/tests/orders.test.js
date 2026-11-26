@@ -355,37 +355,53 @@ describe('POST /api/v1/payments/notifications (Webhook Midtrans)', () => {
     const res = await request(app).post('/api/v1/payments/notifications').send(buildPayload());
 
     expect(res.status).toBe(200);
+    expect(res.body.data.processed).toBe(true);
     expect(res.body.data.status).toBe('paid');
     expect(h.state.orders[0].status).toBe('paid');
     expect(h.state.orders[0].paid_at).toBeTruthy();
     expect(h.state.orders[0].midtrans_payment_type).toBe('qris');
   });
 
-  it('signature salah ditolak 403 FORBIDDEN', async () => {
+  it('notifikasi tes dari dasbor MAP (tanpa signature) di-ack 200 tanpa mengubah status', async () => {
+    const res = await request(app).post('/api/v1/payments/notifications').send({ test: true });
+
+    expect(res.status).toBe(200);
+    expect(res.body.data.processed).toBe(false);
+    expect(res.body.data.reason).toBe('TEST_OR_INCOMPLETE_PAYLOAD');
+    expect(h.state.orders[0].status).toBe('pending');
+  });
+
+  it('signature salah tetap 200 tetapi status pesanan tidak berubah', async () => {
     const payload = buildPayload();
     payload.signature_key = 'signature-palsu';
 
     const res = await request(app).post('/api/v1/payments/notifications').send(payload);
 
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(200);
+    expect(res.body.data.processed).toBe(false);
+    expect(res.body.data.reason).toBe('INVALID_SIGNATURE');
     expect(h.state.orders[0].status).toBe('pending');
   });
 
-  it('nominal tidak sesuai pesanan ditolak 403', async () => {
+  it('nominal tidak sesuai pesanan diabaikan tanpa mengubah status', async () => {
     const payload = buildPayload({ gross_amount: '999999.00' });
 
     const res = await request(app).post('/api/v1/payments/notifications').send(payload);
 
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(200);
+    expect(res.body.data.processed).toBe(false);
+    expect(res.body.data.reason).toBe('AMOUNT_MISMATCH');
     expect(h.state.orders[0].status).toBe('pending');
   });
 
-  it('order tidak dikenal mengembalikan 404', async () => {
+  it('order tidak dikenal di-ack 200 tanpa error', async () => {
     const payload = buildPayload({ order_id: 'HIMAR-TIDAKADA' });
 
     const res = await request(app).post('/api/v1/payments/notifications').send(payload);
 
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(200);
+    expect(res.body.data.processed).toBe(false);
+    expect(res.body.data.reason).toBe('ORDER_NOT_FOUND');
   });
 
   it('expire mengubah status menjadi expired', async () => {
@@ -397,6 +413,7 @@ describe('POST /api/v1/payments/notifications (Webhook Midtrans)', () => {
     const res = await request(app).post('/api/v1/payments/notifications').send(payload);
 
     expect(res.status).toBe(200);
+    expect(res.body.data.processed).toBe(true);
     expect(res.body.data.status).toBe('expired');
     expect(h.state.orders[0].paid_at).toBeFalsy();
   });

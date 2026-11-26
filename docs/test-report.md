@@ -23,7 +23,7 @@ Penguji: Antigravity Automated Verification & QA Suite
   - `POST /api/v1/orders/whatsapp-link`: kalkulasi harga server-side, validasi varian, penolakan item kosong, format URL `wa.me`
   - `POST /api/v1/orders` (Amandemen v2): kalkulasi harga server-side, aturan Himar Delivery (minimum nominal, signature dihitung ganda, ongkir flat), validasi alamat delivery, mock Midtrans Snap, penanganan kegagalan pembayaran (503 `PAYMENT_UNAVAILABLE`)
   - `GET /api/v1/orders/:code` (Amandemen v2): status pesanan ditemukan/404
-  - `POST /api/v1/payments/notifications` (Amandemen v2): verifikasi signature sha512, mapping status Midtrans (`settlement` → `paid`, `expire` → `expired`), penolakan signature/nominal palsu (403)
+  - `POST /api/v1/payments/notifications` (Amandemen v2): verifikasi signature sha512, mapping status Midtrans (`settlement` → `paid`, `expire` → `expired`); mengikuti kontrak ack Midtrans — selalu balas 200, status pesanan hanya berubah saat signature + nominal valid
   - `POST /api/v1/chat`: validasi pesan kosong/panjang (>500), klasifikasi intent (`tanya_menu`, `pemesanan`, `di_luar_konteks`) dan action buttons
   - Routing 404 global dengan format standar JSON `{ success: false, error: { code: 'NOT_FOUND' } }`
 

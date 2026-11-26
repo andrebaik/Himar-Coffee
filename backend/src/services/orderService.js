@@ -262,7 +262,13 @@ const mapTransactionStatus = (transactionStatus, fraudStatus) => {
 };
 
 /**
- * Webhook notifikasi Midtrans. Validasi pembayaran hanya lewat sini.
+ * Webhook notifikasi Midtrans.
+ *
+ * Kontrak Midtrans: endpoint WAJIB membalas 2xx untuk setiap notifikasi yang
+ * diterima (termasuk notifikasi tes dari dasbor MAP). Keamanan tidak bergantung
+ * pada kode HTTP, melainkan pada aturan: status pesanan HANYA berubah jika
+ * signature sha512 valid DAN nominal cocok. Notifikasi tidak valid dicatat di
+ * log lalu diabaikan (processed: false).
  */
 export const handlePaymentNotification = async (payload) => {
   const orderId = payload?.order_id;
@@ -272,8 +278,9 @@ export const handlePaymentNotification = async (payload) => {
   const transactionStatus = payload?.transaction_status;
   const fraudStatus = payload?.fraud_status || 'accept';
 
-  if (!orderId || !statusCode || !grossAmount || !signatureKey || !transactionStatus) {
-    throw new AppError('VALIDATION_ERROR', 400, 'Payload notifikasi tidak lengkap');
+  // Notifikasi tes dari dasbor MAP / ping tanpa data penuh: ack saja.
+  if (!orderId || !signatureKey || !transactionStatus) {
+    return { received: true, processed: false, reason: 'TEST_OR_INCOMPLETE_PAYLOAD' };
   }
 
   const expectedSignature = crypto
@@ -282,7 +289,8 @@ export const handlePaymentNotification = async (payload) => {
     .digest('hex');
 
   if (expectedSignature !== signatureKey) {
-    throw new AppError('FORBIDDEN', 403, 'Signature notifikasi tidak valid');
+    console.warn(`[midtrans-webhook] signature tidak valid untuk order ${orderId}`);
+    return { received: true, processed: false, reason: 'INVALID_SIGNATURE' };
   }
 
   const { data: order, error } = await supabaseAdmin
@@ -292,17 +300,19 @@ export const handlePaymentNotification = async (payload) => {
     .maybeSingle();
 
   if (error || !order) {
-    throw new AppError('NOT_FOUND', 404, 'Pesanan tidak ditemukan');
+    console.warn(`[midtrans-webhook] order tidak ditemukan: ${orderId}`);
+    return { received: true, processed: false, reason: 'ORDER_NOT_FOUND' };
   }
 
   const notifiedAmount = Math.round(parseFloat(grossAmount));
   if (Number.isNaN(notifiedAmount) || notifiedAmount !== order.total) {
-    throw new AppError('FORBIDDEN', 403, 'Nominal notifikasi tidak sesuai pesanan');
+    console.warn(`[midtrans-webhook] nominal tidak cocok untuk order ${orderId}: ${grossAmount}`);
+    return { received: true, processed: false, reason: 'AMOUNT_MISMATCH' };
   }
 
   // Status paid tidak boleh ditimpa mundur oleh notifikasi lama/berulang.
   if (order.status === 'paid') {
-    return { order_code: orderId, status: order.status, changed: false };
+    return { order_code: orderId, status: order.status, processed: false, reason: 'ALREADY_PAID' };
   }
 
   const nextStatus = mapTransactionStatus(transactionStatus, fraudStatus);
@@ -325,5 +335,5 @@ export const handlePaymentNotification = async (payload) => {
     throw new AppError('INTERNAL_ERROR', 500, 'Gagal memperbarui status pesanan');
   }
 
-  return { order_code: updated.order_code, status: updated.status, changed: true };
+  return { order_code: updated.order_code, status: updated.status, processed: true };
 };

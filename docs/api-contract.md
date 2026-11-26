@@ -593,22 +593,35 @@ Dipanggil **oleh Midtrans**, bukan frontend. URL-nya dikonfigurasi di dasbor
 Midtrans (Settings → Configuration → **Payment Notification URL**), contoh:
 `https://<backend>/api/v1/payments/notifications`.
 
-Validasi berlapis:
+Validasi berlapis — respons selalu `200` (kontrak ack Midtrans), tetapi **status
+pesanan hanya berubah** jika semua pemeriksaan lolos:
 
-1. Verifikasi `signature_key = sha512(order_id + status_code + gross_amount + server_key)`.
-   Salah → 403 `FORBIDDEN`.
-2. `gross_amount` harus sama dengan total pesanan. Beda → 403 `FORBIDDEN`.
-3. Mapping status: `settlement`/`capture` (fraud `accept`) → `paid` (+`paid_at`),
+1. Payload tanpa `order_id`/`signature_key`/`transaction_status` (mis. notifikasi
+   tes dari dasbor MAP) → di-ack, `processed: false`,
+   `reason: TEST_OR_INCOMPLETE_PAYLOAD`.
+2. `signature_key` ≠ `sha512(order_id + status_code + gross_amount + server_key)`
+   → di-ack, tidak diproses, `reason: INVALID_SIGNATURE` (dicatat di log).
+3. `gross_amount` ≠ total pesanan → di-ack, tidak diproses, `reason: AMOUNT_MISMATCH`.
+4. Mapping status: `settlement`/`capture` (fraud `accept`) → `paid` (+`paid_at`),
    `capture` (fraud `challenge`) → tetap `pending`, `deny`/`cancel`/`refund` →
    `failed`, `expire` → `expired`.
-4. Status `paid` tidak pernah diturunkan oleh notifikasi berulang.
+5. Status `paid` tidak pernah diturunkan oleh notifikasi berulang.
 
-**Respons 200:**
+**Respons 200 (berhasil diproses):**
 
 ```json
 {
   "success": true,
-  "data": { "order_code": "HIMAR-4F7A21BC", "status": "paid", "changed": true }
+  "data": { "order_code": "HIMAR-4F7A21BC", "status": "paid", "processed": true }
+}
+```
+
+**Respons 200 (di-ack, tidak diproses):**
+
+```json
+{
+  "success": true,
+  "data": { "received": true, "processed": false, "reason": "INVALID_SIGNATURE" }
 }
 ```
 
