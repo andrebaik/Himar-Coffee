@@ -21,6 +21,9 @@ const signatureImages = [
   'https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=1200&q=85',
 ];
 
+// Dua menu signature yang selalu jadi wajah beranda.
+const heroPriority = ['The Lost Sheep', 'Merry Gloss'];
+
 export default function Home() {
   const [featuredMenus, setFeaturedMenus] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
@@ -61,8 +64,22 @@ export default function Home() {
     fetchUpcomingEvents();
   }, []);
 
-  const featuredPair = useMemo(() => featuredMenus.slice(0, 2), [featuredMenus]);
-  const supportingMenus = useMemo(() => featuredMenus.slice(2, 8), [featuredMenus]);
+  // Hero selalu menampilkan kopi signature andalan lebih dulu, bukan urutan
+  // alfabetis dari API (yang bisa menaruh menu makanan di slot utama).
+  const rankedFeatured = useMemo(() => {
+    const rank = (menu) => {
+      const priority = heroPriority.indexOf(menu.name);
+      if (priority !== -1) return priority;
+      return heroPriority.length + (menu.category === 'Signature Coffee' ? 0 : 1);
+    };
+    return [...featuredMenus].sort((a, b) => rank(a) - rank(b));
+  }, [featuredMenus]);
+
+  const featuredPair = useMemo(() => rankedFeatured.slice(0, 2), [rankedFeatured]);
+  const supportingMenus = useMemo(
+    () => rankedFeatured.slice(2).filter((menu) => menu.image_url).slice(0, 6),
+    [rankedFeatured]
+  );
 
   const openChat = () => {
     document.getElementById('himar-chat-toggle')?.click();
