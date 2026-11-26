@@ -34,12 +34,12 @@ describe('Public API Endpoints', () => {
     });
   });
 
-  it('GET /api/v1/menus?category=Kopi returns only Kopi items', async () => {
-    const res = await request(app).get('/api/v1/menus?category=Kopi');
+  it('GET /api/v1/menus?category=Coffee%20Based returns only Coffee Based items', async () => {
+    const res = await request(app).get('/api/v1/menus?category=Coffee%20Based');
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     res.body.data.forEach((m) => {
-      expect(m.category).toBe('Kopi');
+      expect(m.category).toBe('Coffee Based');
     });
   });
 
@@ -48,7 +48,7 @@ describe('Public API Endpoints', () => {
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(Array.isArray(res.body.data)).toBe(true);
-    expect(res.body.data).toContain('Kopi');
+    expect(res.body.data).toContain('Coffee Based');
   });
 
   it('GET /api/v1/menus/:id with invalid UUID returns 400 VALIDATION_ERROR', async () => {
@@ -185,15 +185,15 @@ describe('Orders WhatsApp Link Endpoint', () => {
   it('POST /api/v1/orders/whatsapp-link calculates total on server and returns wa.me URL', async () => {
     // Get existing menu from DB
     const menusRes = await request(app).get('/api/v1/menus');
-    const lostSheep = menusRes.body.data.find((m) => m.name === 'The Lost Sheep');
-    expect(lostSheep).toBeDefined();
+    const klepon = menusRes.body.data.find((m) => m.name === 'Klepon Milky Coffee');
+    expect(klepon).toBeDefined();
 
     const res = await request(app)
       .post('/api/v1/orders/whatsapp-link')
       .send({
         items: [
           {
-            menu_id: lostSheep.id,
+            menu_id: klepon.id,
             quantity: 2,
             variant: 'Iced',
           },
@@ -204,22 +204,22 @@ describe('Orders WhatsApp Link Endpoint', () => {
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data.url).toContain('https://wa.me/62895620019593');
-    expect(res.body.data.text).toContain('The Lost Sheep (Iced) x2');
+    expect(res.body.data.text).toContain('Klepon Milky Coffee (Iced) x2');
     expect(res.body.data.text).toContain('Gula sedikit saja');
-    // Price: (25000 + 3000) * 2 = 56000
-    expect(res.body.data.total).toBe(56000);
+    // Price: (28000 + 3000) * 2 = 62000
+    expect(res.body.data.total).toBe(62000);
   });
 
   it('rejects invalid variant name with 400 VALIDATION_ERROR', async () => {
     const menusRes = await request(app).get('/api/v1/menus');
-    const lostSheep = menusRes.body.data.find((m) => m.name === 'The Lost Sheep');
+    const klepon = menusRes.body.data.find((m) => m.name === 'Klepon Milky Coffee');
 
     const res = await request(app)
       .post('/api/v1/orders/whatsapp-link')
       .send({
         items: [
           {
-            menu_id: lostSheep.id,
+            menu_id: klepon.id,
             quantity: 1,
             variant: 'SuperSpicyNonExistent',
           },
