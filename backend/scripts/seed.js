@@ -31,11 +31,15 @@ const loadImageMap = async () => {
 const seed = async () => {
   await assertSupabaseHost();
 
+  // Paksa perbarui URL foto menu yang sudah ada (dipakai setelah foto diganti).
+  const FORCE_IMAGES = process.env.FORCE_IMAGES === '1';
+
   const images = await loadImageMap();
   console.log('🌱 Memulai seed menu asli Himar Coffee...\n');
 
   let insertedMenus = 0;
   let updatedMenus = 0;
+  let refreshedImages = 0;
   let skippedMenus = 0;
 
   for (const menu of realMenus) {
@@ -52,7 +56,10 @@ const seed = async () => {
       const isDummy = String(existing.description ?? '').startsWith('[DUMMY]');
 
       if (!isDummy) {
-        if (!existing.image_url && image?.url) {
+        const shouldUpdateImage =
+          image?.url && (FORCE_IMAGES || !existing.image_url) && existing.image_url !== image.url;
+
+        if (shouldUpdateImage) {
           const { error } = await supabase
             .from('menus')
             .update({ image_url: image.url })
@@ -63,7 +70,7 @@ const seed = async () => {
             continue;
           }
 
-          updatedMenus += 1;
+          refreshedImages += 1;
           console.log(`  🖼️  Foto untuk menu "${menu.name}" dipasang.`);
         } else {
           skippedMenus += 1;
@@ -131,9 +138,15 @@ const seed = async () => {
     console.log(`  ✅ Event "${event.title}" ditambahkan.`);
   }
 
+  const parts = [
+    `${insertedMenus} menu baru`,
+    `${updatedMenus} dummy diperbarui`,
+    `${refreshedImages} URL foto diperbarui`,
+    `${skippedMenus} dilewati`,
+  ];
   console.log(
-    `\n🎉 Selesai: ${insertedMenus} menu baru, ${updatedMenus} dummy diperbarui, ` +
-      `${skippedMenus} dilewati; ${insertedEvents} event baru, ${skippedEvents} dilewati.`
+    `\n🎉 Selesai: ${parts.join(', ')}; ` +
+      `${insertedEvents} event baru, ${skippedEvents} dilewati.`
   );
   console.log('⚠️  Harga masih estimasi — periksa dan sesuaikan lewat halaman admin.');
 };

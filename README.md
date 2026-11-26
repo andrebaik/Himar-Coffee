@@ -226,13 +226,24 @@ Pastikan skema tabel di `docs/schema.sql` telah dieksekusi di SQL Editor Supabas
 cd backend
 npm install
 
-# 1) Unggah 62 foto produk asli ke Supabase Storage (butuh koneksi internet)
+# 1) (Opsional) Perbaiki foto beresolusi rendah jadi lebih tajam.
+#    Butuh Real-ESRGAN atau ImageMagick. Melembutkan foto 67-237 px agar
+#    tidak burem saat tampil di kartu menu.
+npm run photos:upscale
+
+# 2) Unggah 62 foto produk asli ke Supabase Storage (butuh koneksi internet)
 #    Sumber foto: folder product-photos/ di root repo (tidak ikut Git).
+#    Foto dikonversi ke WebP (~12 KB/foto) lalu diunggah ke bucket menu-images.
 #    Hasil mapping URL disimpan di scripts/image-map.json.
 npm run upload:images
 
-# 2) Seed menu asli + event contoh
+# 3) Seed menu asli + event contoh
 npm run seed
+
+# Bila foto diganti, naikkan versi agar cache CDN/browser tidak menyajikan
+# gambar lama, lalu paksa URL di database ikut diperbarui:
+#   IMAGE_VERSION=3 npm run upload:images
+#   FORCE_IMAGES=1 npm run seed
 
 # Alternatif tanpa foto/Supabase Storage: seed data dummy lama
 npm run seed:dummy

@@ -1,6 +1,8 @@
 import 'dotenv/config';
-import { readFile, writeFile } from 'fs/promises';
+import { readFile, writeFile, mkdtemp, rm } from 'fs/promises';
 import { existsSync } from 'fs';
+import { execFileSync } from 'child_process';
+import os from 'os';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createClient } from '@supabase/supabase-js';
@@ -16,11 +18,27 @@ const outputFile = path.join(__dirname, 'image-map.json');
 
 const BUCKET = 'menu-images';
 const DRY_RUN = process.env.DRY_RUN === '1' || process.argv.includes('--dry-run');
+// Naikkan versi ini saat foto diganti, agar CDN/browser tidak memakai cache lama.
+const IMAGE_VERSION = process.env.IMAGE_VERSION;
 const MIME_BY_EXT = {
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
   '.png': 'image/png',
   '.webp': 'image/webp',
+};
+
+// PNG hasil upscale bisa ~350 KB/foto. WebP memotongnya drastis tanpa
+// penurunan kualitas yang terlihat. Set IMAGE_FORMAT=png untuk menonaktifkan.
+const IMAGE_FORMAT = (process.env.IMAGE_FORMAT ?? 'webp').toLowerCase();
+const WEBP_QUALITY = process.env.WEBP_QUALITY ?? '82';
+
+const hasMagick = () => {
+  try {
+    execFileSync('magick', ['-version'], { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 const supabase = createClient(
@@ -49,6 +67,10 @@ const uploadImages = async () => {
 
   const images = {};
   let uploaded = 0;
+  const canConvert = IMAGE_FORMAT === 'webp' && hasMagick();
+  if (IMAGE_FORMAT === 'webp' && !canConvert) {
+    console.warn('  ⚠️  ImageMagick tidak ada: foto diunggah sebagai file asli.');
+  }
 
   for (const menu of realMenus) {
     const filePath = path.join(photoDir, menu.photo);
@@ -57,19 +79,34 @@ const uploadImages = async () => {
       continue;
     }
 
-    const ext = path.extname(menu.photo).toLowerCase();
-    const contentType = MIME_BY_EXT[ext];
+    const sourceExt = path.extname(menu.photo).toLowerCase();
+    const contentType = MIME_BY_EXT[sourceExt];
     if (!contentType) {
       console.warn(`  ⚠️  Tipe file tidak didukung, dilewati: ${menu.photo}`);
       continue;
     }
 
-    const storagePath = `menus/${slugify(path.basename(menu.photo, ext))}${ext}`;
-    const fileBuffer = await readFile(filePath);
+    const outExt = canConvert ? '.webp' : sourceExt;
+    const outType = canConvert ? 'image/webp' : contentType;
+    const storagePath = `menus/${slugify(path.basename(menu.photo, sourceExt))}${outExt}`;
+
+    let fileBuffer;
+    if (canConvert && sourceExt !== '.webp') {
+      const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'himar-img-'));
+      const tmpFile = path.join(tmpDir, 'out.webp');
+      try {
+        execFileSync('magick', [filePath, '-strip', '-quality', WEBP_QUALITY, tmpFile]);
+        fileBuffer = await readFile(tmpFile);
+      } finally {
+        await rm(tmpDir, { recursive: true, force: true });
+      }
+    } else {
+      fileBuffer = await readFile(filePath);
+    }
 
     if (!DRY_RUN) {
       const { error } = await supabase.storage.from(BUCKET).upload(storagePath, fileBuffer, {
-        contentType,
+        contentType: outType,
         upsert: true,
       });
 
@@ -79,9 +116,10 @@ const uploadImages = async () => {
       }
     }
 
-    const publicUrl = DRY_RUN
+    const rawUrl = DRY_RUN
       ? `${process.env.SUPABASE_URL?.replace(/\/$/, '')}/storage/v1/object/public/${BUCKET}/${storagePath}`
       : supabase.storage.from(BUCKET).getPublicUrl(storagePath).data.publicUrl;
+    const publicUrl = IMAGE_VERSION ? `${rawUrl}?v=${IMAGE_VERSION}` : rawUrl;
 
     images[menu.name] = { url: publicUrl, path: storagePath };
     uploaded += 1;

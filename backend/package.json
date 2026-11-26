@@ -9,7 +9,8 @@
     "seed:dummy": "node scripts/seed_dummy.js",
     "upload:images": "node scripts/upload_menu_images.js",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "photos:upscale": "node scripts/upscale_photos.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.0",
