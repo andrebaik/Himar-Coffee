@@ -66,6 +66,7 @@ export function CartProvider({ children }) {
           menu_id: menu.id,
           name: menu.name,
           price: menu.price,
+          category: menu.category,
           variant: variantName,
           extra_price: extraPrice,
           quantity: Math.min(50, quantity),
@@ -116,6 +117,12 @@ export function CartProvider({ children }) {
     0
   );
 
+  // Amandemen v2: menu signature dihitung ganda untuk minimum order Himar Delivery.
+  const effectiveTotal = items.reduce((acc, cur) => {
+    const isSignature = cur.category === 'Signature Coffee';
+    return acc + (cur.price + (cur.extra_price || 0)) * cur.quantity * (isSignature ? 2 : 1);
+  }, 0);
+
   return (
     <CartContext.Provider
       value={{
@@ -130,6 +137,7 @@ export function CartProvider({ children }) {
         clearCart,
         totalQuantity,
         estimatedTotal,
+        effectiveTotal,
       }}
     >
       {children}

@@ -21,6 +21,9 @@ Penguji: Antigravity Automated Verification & QA Suite
   - `POST /api/v1/admin/menus`, validasi kolom wajib & harga negatif, proteksi admin
   - Otorisasi admin: tolak non-admin email (403 `FORBIDDEN`)
   - `POST /api/v1/orders/whatsapp-link`: kalkulasi harga server-side, validasi varian, penolakan item kosong, format URL `wa.me`
+  - `POST /api/v1/orders` (Amandemen v2): kalkulasi harga server-side, aturan Himar Delivery (minimum nominal, signature dihitung ganda, ongkir flat), validasi alamat delivery, mock Midtrans Snap, penanganan kegagalan pembayaran (503 `PAYMENT_UNAVAILABLE`)
+  - `GET /api/v1/orders/:code` (Amandemen v2): status pesanan ditemukan/404
+  - `POST /api/v1/payments/notifications` (Amandemen v2): verifikasi signature sha512, mapping status Midtrans (`settlement` → `paid`, `expire` → `expired`), penolakan signature/nominal palsu (403)
   - `POST /api/v1/chat`: validasi pesan kosong/panjang (>500), klasifikasi intent (`tanya_menu`, `pemesanan`, `di_luar_konteks`) dan action buttons
   - Routing 404 global dengan format standar JSON `{ success: false, error: { code: 'NOT_FOUND' } }`
 
@@ -38,7 +41,10 @@ Penguji: Antigravity Automated Verification & QA Suite
 | 6 | Chatbot - di luar konteks | Tanya "siapa presiden Indonesia?" | Bot menjawab hanya bisa bantu soal Himar Coffee | Bot mengenali `di_luar_konteks`, menjawab ramah bahwa bot hanya membantu seputar Himar Coffee | ✅ PASS |
 | 7 | Chatbot - input kosong | Kirim pesan kosong | Ditolak, tidak terkirim | Tombol kirim dinonaktifkan saat input kosong; validasi backend mengembalikan 400 `VALIDATION_ERROR` | ✅ PASS |
 | 8 | Chatbot - teks panjang | Kirim >500 karakter | Ditolak dengan pesan error | Input dibatasi client-side maks 500 karakter; backend mengembalikan 400 jika melebihi batas | ✅ PASS |
-| 9 | Keranjang + WhatsApp | Tambah item berbagai varian, ubah qty, kirim | Teks WhatsApp sesuai format | Total dihitung di server, teks tersusun rapi dengan nomor WhatsApp `62895620019593`, URL `wa.me` terbuka | ✅ PASS |
+| 9 | Keranjang + WhatsApp (fallback) | Tambah item berbagai varian, ubah qty, kirim via tombol WhatsApp sekunder | Teks WhatsApp sesuai format | Total dihitung di server, teks tersusun rapi dengan nomor WhatsApp `62895620019593`, URL `wa.me` terbuka | ✅ PASS |
+| 9b | Checkout Midtrans (Amandemen v2) | Tambah item → "Lanjut ke Checkout" → isi data → Bayar | Snap popup terbuka, setelah bayar status jadi `paid` | Backend terverifikasi via test otomatis (15 kasus); uji popup Snap end-to-end perlu dilakukan manual dengan kartu sandbox `4811 1111 1111 1114` | ⏳ Perlu uji manual (sandbox) |
+| 9c | Minimum order Himar Delivery (Amandemen v2) | Pilih delivery dengan subtotal di bawah Rp30.000 | Ditolak dengan pesan sisa nominal | Backend 400 `VALIDATION_ERROR` dengan pesan "Kurang Rp…" + info signature dihitung ganda (test otomatis lulus); tombol Bayar dinonaktifkan di UI | ✅ PASS (backend) |
+| 9d | Signature dihitung ganda (Amandemen v2) | Delivery hanya 1 menu signature Rp20.000 (< minimum) | Lolos minimum karena efektif Rp40.000 | Order dibuat, ongkir Rp8.000 ditambahkan, badge signature tampil di keranjang & checkout | ✅ PASS |
 | 10 | Admin login salah | Masukkan email/password salah | Pesan error generik | Menampilkan pesan error: "Email atau kata sandi salah" tanpa membocorkan detail akun | ✅ PASS |
 | 11 | Admin login benar | Login dengan kredensial valid | Redirect ke halaman admin | Token sesi tersimpan, redirect otomatis ke `/admin/menus` | ✅ PASS |
 | 12 | Admin tambah menu | Isi form menu lengkap, simpan | Menu baru muncul di halaman pelanggan | Menu tersimpan ke Supabase dan langsung tampil di katalog publik `/menu` | ✅ PASS |

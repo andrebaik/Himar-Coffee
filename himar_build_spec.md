@@ -1,5 +1,11 @@
 # SPESIFIKASI BUILD: Platform Etalase Digital + Asisten Chatbot Himar Coffee Garut
 
+> **⚠️ AMANDEMEN v2 (26-11-2026):** Dokumen ini sudah diperbarui lewat amandemen.
+> Pembayaran via Midtrans + fitur **Himar Delivery** kini MASUK cakupan (sebelumnya
+> dilarang di bagian "Di luar cakupan"). Lihat **Bagian 15 — Amandemen v2** di akhir
+> dokumen untuk daftar lengkap perubahannya. Bagian yang ditimpa amandemen ditandai
+> catatan `[DIAMANDEMEN v2]`.
+
 Kamu adalah AI engineer yang akan membangun aplikasi ini dari nol sampai siap deploy. Baca seluruh dokumen ini dulu sebelum menulis kode. Ikuti spesifikasi secara tepat. Jangan menambah fitur di luar dokumen, jangan mengubah nama endpoint, kolom, atau format respons. Jika ada hal yang benar-benar memblokir dan tidak bisa diputuskan dari dokumen ini, ajukan satu pertanyaan singkat; selain itu ambil keputusan terbaik dan catat di README bagian "Keputusan Desain".
 
 Bahasa: seluruh teks antarmuka, pesan error ke pengguna, dan dokumentasi dalam **Bahasa Indonesia**. Nama variabel, fungsi, file, dan kolom dalam bahasa Inggris.
@@ -459,3 +465,108 @@ Kerjakan **berurutan**. Di akhir tiap fase, jalankan dan verifikasi sendiri, lal
 - [ ] Antarmuka memakai CSS framework (Tailwind); mockup/desain mengikuti bagian 8.1.
 - [ ] Riwayat chat tersimpan di database.
 - [ ] Riwayat kode memakai Git; commit kecil dan bermakna per fase.
+
+---
+
+## 15. AMANDEMEN v2 — Checkout Online (Midtrans) + Himar Delivery
+
+> Tanggal: 26-11-2026. Status: DISETUJUI pemilik proyek. Amandemen ini MENIMPA
+> bagian-bagian lama yang bertentangan. Setiap perubahan lanjutan setelah v2
+> wajib dicatat di bagian 15.8 (Changelog Amandemen) agar dokumen selalu mutakhir.
+
+### 15.1 Keputusan yang ditimpa
+
+| Bagian lama | Keputusan lama | Keputusan baru (v2) |
+|---|---|---|
+| §1 "Di luar cakupan" | Payment gateway & data pribadi pelanggan DILARANG | Midtrans Snap + data pelanggan (nama, HP, alamat delivery) DIIZINKAN |
+| §6.4 / §8.5 | Checkout berakhir di WhatsApp | Checkout utama di website dengan pembayaran Midtrans Snap; WhatsApp diturunkan menjadi **fallback sekunder** |
+| §4 Tabel | Tidak ada tabel pesanan | Tabel baru **`orders`** (lihat 15.2) |
+| §8.2 Rute | Tidak ada halaman checkout | Rute baru `/checkout` dan `/order/:code` |
+
+### 15.2 Tabel baru: `orders`
+
+```sql
+CREATE TABLE IF NOT EXISTS orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_code TEXT NOT NULL UNIQUE,               -- HIMAR-XXXXXXXX, dipakai sebagai order_id Midtrans
+  customer_name TEXT NOT NULL,
+  customer_phone TEXT NOT NULL,
+  fulfillment_type TEXT NOT NULL CHECK (fulfillment_type IN ('pickup','delivery')),
+  delivery_address TEXT,                          -- wajib bila fulfillment_type='delivery'
+  note TEXT,
+  items JSONB NOT NULL DEFAULT '[]',              -- snapshot: {menu_id, name, variant, unit_price, quantity, is_signature}
+  subtotal INTEGER NOT NULL CHECK (subtotal >= 0),
+  delivery_fee INTEGER NOT NULL DEFAULT 0 CHECK (delivery_fee >= 0),
+  total INTEGER NOT NULL CHECK (total >= 0),
+  status TEXT NOT NULL DEFAULT 'pending'
+    CHECK (status IN ('pending','paid','failed','expired','cancelled')),
+  midtrans_transaction_id TEXT,
+  midtrans_payment_type TEXT,
+  paid_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+-- RLS aktif; backend memakai secret key (bypass RLS), pola sama dengan tabel lain.
+```
+
+SQL ini juga ditambahkan ke `docs/schema.sql`. Tabel `sales` TIDAK diubah.
+
+### 15.3 Aturan Himar Delivery (wajib divalidasi di BACKEND, bukan hanya UI)
+
+- **Metode:** `pickup` (ambil di kedai) atau `delivery` (Himar Delivery, ongkir flat).
+- **Ongkir flat** `DELIVERY_FEE` (default `8000`), hanya untuk `delivery`, ditambahkan setelah subtotal. Pickup ongkir 0.
+- **Minimum order (nominal):** untuk `delivery`, subtotal harus ≥ `DELIVERY_MIN_ORDER` (default `30000`). Pickup tanpa minimum.
+- **Menu signature dihitung ganda:** item dengan `category = 'Signature Coffee'` dihitung 2× nilai harganya saat menghitung *subtotal efektif* untuk memenuhi minimum order. Contoh: 2 signature @Rp32.000 → subtotal efektif Rp128.000. Subtotal yang ditagihkan ke pelanggan tetap nilai asli (ganda hanya untuk uji minimum).
+- **Prioritas tampilan signature:** di keranjang & halaman checkout, item signature ditandai badge dan ditampilkan paling atas; pesan progres minimum order menyebut keuntungan signature ("menu signature dihitung ganda").
+- Pesan error minimum harus ramah dan menyebut sisa nominal yang kurang.
+- Nominal via env agar bisa diubah tanpa deploy ulang.
+
+### 15.4 Endpoint baru (backend)
+
+| Method | Path | Keterangan |
+|---|---|---|
+| POST | `/orders` | Buat pesanan + transaksi Midtrans Snap. Body: `{ items, note?, customer_name, customer_phone, fulfillment_type, delivery_address? }`. Backend validasi menu/varian/ketersediaan, hitung subtotal & ongkir server-side (anti-manipulasi harga tetap berlaku), validasi aturan delivery (15.3), simpan order `status=pending`, panggil Snap API → respons `{ order_code, snap_token, redirect_url, total }`. |
+| GET | `/orders/:code` | Cek status pesanan publik berdasar `order_code` (untuk halaman status). |
+| POST | `/payments/notifications` | Webhook Midtrans (tanpa auth, tapi wajib verifikasi signature `sha512(order_id+status_code+gross_amount+serverKey)`). Mapping: `settlement/capture → paid`, `deny/cancel → failed`, `expire → expired`. **Status `paid` HANYA boleh ditetapkan di sini** — frontend tidak pernah dipercaya. |
+
+- `POST /orders/whatsapp-link` TETAP ADA sebagai fallback (bagian 6.4 tetap berlaku untuk endpoint ini).
+- Rate limit khusus `POST /orders`: maks 10 request/menit/IP.
+- Webhook URL dikonfigurasi di dasbor Midtrans (Settings → Configuration → Payment Notification URL), bukan per-transaksi.
+
+### 15.5 Variabel lingkungan baru
+
+`backend/.env` (tambahan):
+```
+MIDTRANS_SERVER_KEY=SB-Mid-server-...      # Sandbox: prefix SB-
+MIDTRANS_CLIENT_KEY=SB-Mid-client-...
+MIDTRANS_IS_PRODUCTION=false
+DELIVERY_FEE=8000                           # ongkir flat Himar Delivery (Rupiah)
+DELIVERY_MIN_ORDER=30000                    # minimum subtotal delivery (Rupiah)
+```
+
+`frontend/.env` (tambahan):
+```
+VITE_MIDTRANS_CLIENT_KEY=SB-Mid-client-...  # untuk memuat snap.js popup
+```
+
+### 15.6 Perubahan frontend
+
+- **`/checkout`:** form nama (2–60), no. HP (format 08…/62…, 9–16 digit), pilihan Pickup/Himar Delivery, alamat (wajib jika delivery, maks 250), catatan; ringkasan subtotal + ongkir + total; indikator progres minimum order untuk delivery (dengan catatan signature dihitung ganda); tombol Bayar → Midtrans Snap popup (`snap.pay(token)` via `snap.js` + `VITE_MIDTRANS_CLIENT_KEY`); jika Snap gagal dimuat → fallback `redirect_url`.
+- **`/order/:code`:** halaman status dengan polling `GET /orders/:code` tiap 3 detik selama `pending`; sukses → kartu hijau "Pembayaran diterima"; gagal/kedaluwarsa → pesan + tombol "Pesan ulang".
+- **CartDrawer:** tombol utama "Lanjut ke Checkout" (navigasi ke `/checkout`); tombol WhatsApp dipindah jadi tautan sekunder kecil; badge "Signature" + urutan item signature di atas; pesan progres minimum order.
+- **CartContext:** item kini menyimpan `category` untuk deteksi signature di sisi klien (validasi final tetap di backend).
+- Semua status UI wajib (loading/sukses/gagal/kosong) tetap berlaku.
+
+### 15.7 Pengujian baru (Vitest)
+
+- `POST /orders`: total dihitung server; menu tidak tersedia/varian tidak dikenal ditolak; delivery di bawah minimum ditolak (400, pesan menyebut sisa nominal); signature dihitung ganda dalam uji minimum; pickup tanpa alamat lolos, delivery tanpa alamat ditolak; ongkir ditambahkan hanya untuk delivery.
+- Webhook: signature salah → 403 `FORBIDDEN`; signature benar `settlement` → order jadi `paid` + `paid_at` terisi; order tidak dikenal → 404.
+- `GET /orders/:code`: kode tidak dikenal → 404.
+- Mock Midtrans Snap (`createTransaction`) di test.
+
+### 15.8 Changelog Amandemen
+
+| Versi | Tanggal | Perubahan |
+|---|---|---|
+| v2 | 26-11-2026 | Checkout online Midtrans Snap (sandbox dulu), tabel `orders`, webhook `/payments/notifications`, fitur Himar Delivery (pickup + delivery, ongkir flat, minimum nominal, signature dihitung ganda + prioritas tampilan), WhatsApp jadi fallback, rute `/checkout` & `/order/:code`, env Midtrans & delivery baru. |
+| v2.1 (implementasi) | 26-11-2026 | Amandemen v2 **diimplementasikan penuh**. Backend: `orderService.js` (resolveItems harga server-side, aturan delivery, generate `HIMAR-XXXXXXXX`, retry kode, `PAYMENT_UNAVAILABLE` 503 saat Snap gagal + order ditandai `failed`; webhook verifikasi sha512 + cek nominal + proteksi status `paid` tidak diturunkan), `orderController.js`, `routes/orders.js` (POST `/` + rate limit 10/menit, GET `/:code`, POST `/whatsapp-link` fallback), `routes/payments.js` (webhook), mount `/api/v1/payments` di `app.js`, `orderLimiter` di `rateLimit.js`. DB: migrasi `create_orders_table` diterapkan ke Supabase project aktif (tabel `orders` + RLS + index) dan `docs/schema.sql` diperbarui. Test: `tests/orders.test.js` baru, 15 kasus (semua 40 test backend lulus). Frontend: CartContext simpan `category` + `effectiveTotal`, `api/orders.js`, CartDrawer (tombol utama Checkout, WhatsApp fallback sekunder, badge + urutan signature, info minimum), halaman `Checkout.jsx` (Snap popup + fallback redirect), `OrderStatus.jsx` (polling 3 detik), rute `/checkout` & `/order/:code`, build produksi lulus. Docs: README (arsitektur, env, keputusan desain 5–7, batasan), `api-contract.md` 2.9–2.11 + kode `PAYMENT_UNAVAILABLE`, `api.http`, `user-manual.md` 1.2, `test-report.md`. |

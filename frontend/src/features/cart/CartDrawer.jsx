@@ -1,10 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { X, Plus, Minus, Trash2, ShoppingBag, Send, AlertCircle, ExternalLink } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { X, Plus, Minus, Trash2, ShoppingBag, Send, AlertCircle, ExternalLink, CreditCard, Star } from 'lucide-react';
 import { useCart } from './CartContext.jsx';
 import { formatRupiah } from '../../lib/format.js';
 import ImageWithFallback from '../../components/ImageWithFallback.jsx';
-import client, { normalizeError } from '../../api/client.js';
+import { createWhatsappOrderLink } from '../../api/orders.js';
+import { normalizeError } from '../../api/client.js';
 import toast from 'react-hot-toast';
+
+const DELIVERY_MIN_ORDER = 30000;
 
 export default function CartDrawer() {
   const {
@@ -16,8 +20,10 @@ export default function CartDrawer() {
     updateQuantity,
     removeFromCart,
     estimatedTotal,
+    effectiveTotal,
     clearCart,
   } = useCart();
+  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
   const [popupBlockedUrl, setPopupBlockedUrl] = useState(null);
@@ -39,9 +45,24 @@ export default function CartDrawer() {
     };
   }, [isOpen, setIsOpen]);
 
+  // Amandemen v2: menu signature diprioritaskan tampil di atas.
+  const sortedItems = useMemo(() => {
+    return [...items].sort((a, b) => {
+      const aSig = a.category === 'Signature Coffee' ? 0 : 1;
+      const bSig = b.category === 'Signature Coffee' ? 0 : 1;
+      return aSig - bSig;
+    });
+  }, [items]);
+
   if (!isOpen) return null;
 
-  const handleCheckout = async () => {
+  const handleGoToCheckout = () => {
+    if (items.length === 0) return;
+    setIsOpen(false);
+    navigate('/checkout');
+  };
+
+  const handleWhatsappFallback = async () => {
     if (items.length === 0) return;
 
     setIsLoading(true);
@@ -57,12 +78,12 @@ export default function CartDrawer() {
         note: note ? note.trim() : undefined,
       };
 
-      const res = await client.post('/orders/whatsapp-link', payload);
-      const { url } = res.data.data;
-      const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+      const data = await createWhatsappOrderLink(payload);
+
+      const newWindow = window.open(data.url, '_blank', 'noopener,noreferrer');
 
       if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-        setPopupBlockedUrl(url);
+        setPopupBlockedUrl(data.url);
         toast('Popup WhatsApp diblokir. Gunakan tautan manual di bawah.', { icon: '!' });
       } else {
         toast.success('WhatsApp dibuka untuk melanjutkan pesanan.');
@@ -74,6 +95,8 @@ export default function CartDrawer() {
       setIsLoading(false);
     }
   };
+
+  const deliveryShortage = Math.max(0, DELIVERY_MIN_ORDER - effectiveTotal);
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end" role="presentation">
@@ -111,15 +134,22 @@ export default function CartDrawer() {
           ) : (
             <div className="space-y-8">
               <div className="divide-y divide-[#ded2c1] border-y border-[#ded2c1]">
-                {items.map((item) => {
+                {sortedItems.map((item) => {
                   const unitPrice = item.price + (item.extra_price || 0);
                   const itemTotal = unitPrice * item.quantity;
+                  const isSignature = item.category === 'Signature Coffee';
 
                   return (
                     <div key={`${item.menu_id}-${item.variant || 'default'}`} className="grid grid-cols-[4.5rem_1fr_auto] gap-4 py-5">
                       <ImageWithFallback src={item.image_url} alt="" aspectRatio="h-[4.5rem] w-[4.5rem]" fallbackLabel="Foto belum tersedia" className="h-[4.5rem] w-[4.5rem]" />
                       <div className="min-w-0">
                         <h3 className="truncate text-lg leading-none text-[#281a13]">{item.name}</h3>
+                        {isSignature && (
+                          <span className="mt-2 inline-flex items-center gap-1 bg-[#b5532c] px-2 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.1em] text-white">
+                            <Star className="h-3 w-3" aria-hidden="true" />
+                            Signature
+                          </span>
+                        )}
                         {item.variant && <p className="mt-2 text-xs font-semibold uppercase tracking-[0.1em] text-[#4f6d52]">{item.variant}</p>}
                         <p className="mt-3 text-sm text-[#6b625b]">{formatRupiah(unitPrice)} per item</p>
                         <p className="mt-1 text-sm font-semibold text-[#b5532c]">{formatRupiah(itemTotal)}</p>
@@ -161,6 +191,17 @@ export default function CartDrawer() {
                 <div className="mt-2 text-right text-xs text-[#6b625b]">{note.length}/200</div>
               </div>
 
+              {deliveryShortage > 0 && (
+                <div className="border border-[#6f8f72]/40 bg-[#f2f6f2] p-4 text-sm leading-6 text-[#4f6d52]">
+                  <p className="font-semibold">Info Himar Delivery</p>
+                  <p className="mt-1">
+                    Minimum pesanan delivery {formatRupiah(DELIVERY_MIN_ORDER)}. Menu <strong>signature</strong> dihitung
+                    ganda — tambah {formatRupiah(deliveryShortage)} lagi (atau lebih rendah dengan menu signature) untuk
+                    bisa delivery.
+                  </p>
+                </div>
+              )}
+
               {popupBlockedUrl && (
                 <div className="border border-[#b5532c]/45 bg-[#fff8f3] p-4 text-sm text-[#6b625b]">
                   <div className="flex items-start gap-3">
@@ -184,11 +225,20 @@ export default function CartDrawer() {
                 <p className="text-xs uppercase tracking-[0.12em] text-[#6b625b]">Perkiraan total</p>
                 <p className="mt-1 font-serif text-3xl text-[#b5532c]">{formatRupiah(estimatedTotal)}</p>
               </div>
-              <p className="max-w-[12rem] text-right text-xs leading-5 text-[#6b625b]">Harga final dan ketersediaan dikonfirmasi barista.</p>
+              <p className="max-w-[12rem] text-right text-xs leading-5 text-[#6b625b]">Harga final dihitung ulang oleh server saat checkout.</p>
             </div>
-            <button type="button" onClick={handleCheckout} disabled={isLoading} className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 bg-[#25d366] px-5 text-xs font-bold uppercase tracking-[0.1em] text-white transition hover:bg-[#20ba59] disabled:cursor-wait disabled:bg-[#6b625b]">
+            <button type="button" onClick={handleGoToCheckout} className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 bg-[#b5532c] px-5 text-xs font-bold uppercase tracking-[0.1em] text-white transition hover:bg-[#8c3f25]">
+              <CreditCard className="h-4 w-4" aria-hidden="true" />
+              Lanjut ke Checkout
+            </button>
+            <button
+              type="button"
+              onClick={handleWhatsappFallback}
+              disabled={isLoading}
+              className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 border border-[#25d366] px-5 text-xs font-bold uppercase tracking-[0.1em] text-[#1f9d4d] transition hover:bg-[#25d366]/10 disabled:cursor-wait disabled:opacity-60"
+            >
               <Send className="h-4 w-4" aria-hidden="true" />
-              {isLoading ? 'Menyiapkan pesanan' : 'Pesan via WhatsApp'}
+              {isLoading ? 'Menyiapkan pesanan' : 'Pesan via WhatsApp (fallback)'}
             </button>
             <button type="button" onClick={clearCart} className="mt-3 inline-flex min-h-11 w-full items-center justify-center text-xs font-semibold text-[#6b625b] transition hover:text-[#b5532c]">Kosongkan keranjang</button>
           </footer>

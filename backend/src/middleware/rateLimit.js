@@ -37,3 +37,9 @@ export const chatLimiter = createRateLimiter({
   max: 20,
   message: 'Terlalu banyak pesan, silakan tunggu sebentar sebelum mengirim pesan lagi',
 });
+
+export const orderLimiter = createRateLimiter({
+  windowMs: 60 * 1000,
+  max: 10,
+  message: 'Terlalu banyak percobaan pesanan, silakan coba lagi setelah 1 menit',
+});

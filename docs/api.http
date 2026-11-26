@@ -40,16 +40,50 @@ Content-Type: application/json
   "message": "menu kopi apa saja?"
 }
 
-### Pesan via WhatsApp (ganti menu_id dengan UUID valid)
+### Pesan via WhatsApp (FALLBACK — ganti menu_id dengan UUID valid)
 POST http://localhost:4000/api/v1/orders/whatsapp-link
 Content-Type: application/json
 
 {
   "items": [
-    { "menu_id": "UUID_MENU_1", "quantity": 2, "variant": "Iced" },
+    { "menu_id": "UUID_MENU_1", "quantity": 2, "variant": "Hot" },
     { "menu_id": "UUID_MENU_2", "quantity": 1 }
   ],
   "note": "Tidak pakai gula"
+}
+
+### Buat Pesanan + Midtrans Snap (Checkout Utama — ganti menu_id dengan UUID valid)
+POST http://localhost:4000/api/v1/orders
+Content-Type: application/json
+
+{
+  "items": [
+    { "menu_id": "UUID_MENU_1", "quantity": 2, "variant": "Cold" },
+    { "menu_id": "UUID_MENU_SIGNATURE", "quantity": 1 }
+  ],
+  "note": "Tidak pakai gula",
+  "customer_name": "Budi Santoso",
+  "customer_phone": "081234567890",
+  "fulfillment_type": "delivery",
+  "delivery_address": "Jl. Raya Garut No. 10, Tarogong Kidul"
+}
+
+### Cek Status Pesanan (ganti dengan order_code dari respons POST /orders)
+GET http://localhost:4000/api/v1/orders/HIMAR-XXXXXXXX
+
+### Webhook Midtrans (dipanggil oleh Midtrans, bukan manual; signature wajib valid)
+POST http://localhost:4000/api/v1/payments/notifications
+Content-Type: application/json
+
+{
+  "order_id": "HIMAR-XXXXXXXX",
+  "status_code": "200",
+  "gross_amount": "46000.00",
+  "transaction_status": "settlement",
+  "fraud_status": "accept",
+  "transaction_id": "txn-123",
+  "payment_type": "qris",
+  "signature_key": "SHA512_HEX_DARI_MIDTRANS"
 }
 
 ### Login Admin

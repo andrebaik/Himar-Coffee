@@ -16,6 +16,11 @@ const envSchema = Joi.object({
   AI_MOCK: Joi.string().allow('').default('true'),
   AI_TIMEOUT_MS: Joi.number().default(20000),
   INTERNAL_API_KEY: Joi.string().allow('').default(''),
+  MIDTRANS_SERVER_KEY: Joi.string().allow('').default(''),
+  MIDTRANS_CLIENT_KEY: Joi.string().allow('').default(''),
+  MIDTRANS_IS_PRODUCTION: Joi.string().allow('').default('false'),
+  DELIVERY_FEE: Joi.number().integer().min(0).default(8000),
+  DELIVERY_MIN_ORDER: Joi.number().integer().min(0).default(30000),
 }).unknown(true);
 
 const { error, value } = envSchema.validate(process.env, {
@@ -43,6 +48,11 @@ const config = {
   AI_MOCK: value.AI_MOCK,
   AI_TIMEOUT_MS: value.AI_TIMEOUT_MS,
   INTERNAL_API_KEY: value.INTERNAL_API_KEY,
+  MIDTRANS_SERVER_KEY: value.MIDTRANS_SERVER_KEY,
+  MIDTRANS_CLIENT_KEY: value.MIDTRANS_CLIENT_KEY,
+  MIDTRANS_IS_PRODUCTION: value.MIDTRANS_IS_PRODUCTION === 'true',
+  DELIVERY_FEE: value.DELIVERY_FEE,
+  DELIVERY_MIN_ORDER: value.DELIVERY_MIN_ORDER,
 };
 
 export default config;

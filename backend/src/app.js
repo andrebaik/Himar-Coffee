@@ -12,6 +12,7 @@ import eventRoutes from './routes/events.js';
 import authRoutes from './routes/auth.js';
 import adminRoutes from './routes/admin.js';
 import orderRoutes from './routes/orders.js';
+import paymentRoutes from './routes/payments.js';
 import chatRoutes from './routes/chat.js';
 
 const app = express();
@@ -61,6 +62,7 @@ app.use('/api/v1/events', eventRoutes);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/orders', orderRoutes);
+app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/chat', chatRoutes);
 
 app.use((req, res, next) => {

@@ -58,6 +58,7 @@ Dokumentasi lengkap seluruh endpoint backend Express dan kontrak integrasi denga
 | `RATE_LIMITED` | 429 | Terlalu banyak request umum |
 | `AI_RATE_LIMITED` | 429 | Terlalu banyak request ke endpoint chat |
 | `AI_UNAVAILABLE` | 503 | Layanan AI sedang tidak tersedia |
+| `PAYMENT_UNAVAILABLE` | 503 | Layanan pembayaran (Midtrans) sedang tidak tersedia |
 | `INTERNAL_ERROR` | 500 | Kesalahan server internal |
 
 ---
@@ -397,7 +398,10 @@ curl -X POST http://localhost:4000/api/v1/chat \
 
 ---
 
-### 2.8 Link WhatsApp (Pemesanan)
+### 2.8 Link WhatsApp (Pemesanan) — FALLBACK
+
+> **Amandemen v2:** Endpoint ini kini menjadi **fallback sekunder**. Alur utama
+> pemesanan adalah checkout online via Midtrans (bagian 2.9–2.11).
 
 ```
 POST /api/v1/orders/whatsapp-link
@@ -454,6 +458,157 @@ curl -X POST http://localhost:4000/api/v1/orders/whatsapp-link \
       { "field": "items", "message": "Minimal 1 item pesanan" }
     ]
   }
+}
+```
+
+---
+
+### 2.9 Buat Pesanan + Midtrans Snap (Checkout Utama)
+
+> **Amandemen v2.** Rate limit: 10 request/menit/IP.
+
+```
+POST /api/v1/orders
+```
+
+Backend memvalidasi menu/varian/ketersediaan dan **menghitung seluruh harga
+server-side** (harga dari klien diabaikan). Untuk `fulfillment_type = delivery`
+berlaku aturan Himar Delivery: subtotal efektif (menu **Signature Coffee
+dihitung ganda**) harus ≥ `DELIVERY_MIN_ORDER` (default Rp30.000), dan ongkir
+flat `DELIVERY_FEE` (default Rp8.000) ditambahkan ke total. Pickup tanpa
+minimum dan tanpa ongkir.
+
+**Body (JSON):**
+
+| Field | Tipe | Wajib | Deskripsi |
+|-------|------|-------|-----------|
+| `items` | array | Ya | Array item pesanan (1-30 item) |
+| `items[].menu_id` | uuid | Ya | ID menu |
+| `items[].quantity` | integer | Ya | Jumlah (1-50) |
+| `items[].variant` | string | Tidak | Nama varian (misal "Hot"/"Cold") |
+| `note` | string | Tidak | Catatan tambahan (max 200 karakter) |
+| `customer_name` | string | Ya | Nama pemesan (2-60 karakter) |
+| `customer_phone` | string | Ya | Nomor HP (9-16 digit, awalan 0/62/8) |
+| `fulfillment_type` | string | Ya | `pickup` atau `delivery` |
+| `delivery_address` | string | Kondisional | Wajib jika `fulfillment_type=delivery` (max 250 karakter) |
+
+**Curl:**
+
+```bash
+curl -X POST http://localhost:4000/api/v1/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [
+      { "menu_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890", "quantity": 2, "variant": "Cold" }
+    ],
+    "note": "Tidak pakai gula",
+    "customer_name": "Budi Santoso",
+    "customer_phone": "081234567890",
+    "fulfillment_type": "delivery",
+    "delivery_address": "Jl. Raya Garut No. 10, Tarogong Kidul"
+  }'
+```
+
+**Respons 201:**
+
+```json
+{
+  "success": true,
+  "message": "Pesanan berhasil dibuat. Silakan lanjutkan pembayaran.",
+  "data": {
+    "order_code": "HIMAR-4F7A21BC",
+    "snap_token": "1a2b3c4d-...",
+    "redirect_url": "https://app.sandbox.midtrans.com/snap/v2/vttoken/...",
+    "total": 46000,
+    "subtotal": 38000,
+    "delivery_fee": 8000
+  }
+}
+```
+
+**Respons 400 (minimum order delivery tidak terpenuhi):**
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Minimum pesanan Himar Delivery adalah Rp30.000. Kurang Rp12.000 lagi — menu signature dihitung ganda, coba tambah menu signature favoritmu!",
+    "details": [
+      { "field": "items", "message": "Kurang Rp12.000 dari minimum order delivery" }
+    ]
+  }
+}
+```
+
+**Respons 503 (Midtrans tidak tersedia):** `PAYMENT_UNAVAILABLE`.
+
+---
+
+### 2.10 Status Pesanan
+
+```
+GET /api/v1/orders/:code
+```
+
+Cek status pesanan berdasarkan `order_code` (untuk halaman `/order/:code`).
+Status: `pending`, `paid`, `failed`, `expired`, `cancelled`.
+
+**Respons 200:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "order_code": "HIMAR-4F7A21BC",
+    "customer_name": "Budi Santoso",
+    "fulfillment_type": "delivery",
+    "delivery_address": "Jl. Raya Garut No. 10, Tarogong Kidul",
+    "note": "Tidak pakai gula",
+    "items": [
+      { "menu_id": "...", "name": "The Lost Sheep", "variant": "Cold", "unit_price": 38000, "quantity": 1, "is_signature": true }
+    ],
+    "subtotal": 38000,
+    "delivery_fee": 8000,
+    "total": 46000,
+    "status": "pending",
+    "midtrans_payment_type": null,
+    "created_at": "2026-11-26T10:00:00.000Z",
+    "paid_at": null
+  }
+}
+```
+
+**Respons 404:** `NOT_FOUND` — pesanan tidak ditemukan.
+
+---
+
+### 2.11 Webhook Notifikasi Pembayaran (Midtrans)
+
+```
+POST /api/v1/payments/notifications
+```
+
+Dipanggil **oleh Midtrans**, bukan frontend. URL-nya dikonfigurasi di dasbor
+Midtrans (Settings → Configuration → **Payment Notification URL**), contoh:
+`https://<backend>/api/v1/payments/notifications`.
+
+Validasi berlapis:
+
+1. Verifikasi `signature_key = sha512(order_id + status_code + gross_amount + server_key)`.
+   Salah → 403 `FORBIDDEN`.
+2. `gross_amount` harus sama dengan total pesanan. Beda → 403 `FORBIDDEN`.
+3. Mapping status: `settlement`/`capture` (fraud `accept`) → `paid` (+`paid_at`),
+   `capture` (fraud `challenge`) → tetap `pending`, `deny`/`cancel`/`refund` →
+   `failed`, `expire` → `expired`.
+4. Status `paid` tidak pernah diturunkan oleh notifikasi berulang.
+
+**Respons 200:**
+
+```json
+{
+  "success": true,
+  "data": { "order_code": "HIMAR-4F7A21BC", "status": "paid", "changed": true }
 }
 ```
 

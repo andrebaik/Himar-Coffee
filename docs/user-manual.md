@@ -14,14 +14,19 @@ Platform digital Himar Coffee Garut dapat diakses langsung melalui peramban (bro
 3. Gunakan filter kategori (*Semua Menu, Kopi, Non-Kopi, Makanan*) atau ketik nama menu di kolom pencarian.
 4. Klik pada kartu menu untuk melihat informasi detail, foto racikan, dan pilihan varian (*Hot, Iced, dll.*).
 
-### 1.2 Menggunakan Keranjang & Memesan via WhatsApp
+### 1.2 Checkout Online & Pembayaran (Midtrans)
 1. Di modal detail menu, pilih varian yang diinginkan (jika ada) dan tentukan jumlah pesanan.
 2. Klik tombol **"Tambah ke Pesanan"**.
 3. Ikon keranjang di pojok kanan atas akan menampilkan jumlah item yang telah dipilih.
-4. Klik ikon keranjang untuk membuka ringkasan pesanan.
+4. Klik ikon keranjang untuk membuka ringkasan pesanan. Menu **signature** ditandai lencana khusus dan tampil paling atas.
 5. Anda dapat menyesuaikan jumlah porsi, menghapus item, serta menambahkan catatan khusus (misalnya: *"Kurangi gula"* atau *"Es batu dipisah"*).
-6. Klik tombol hijau **"Pesan via WhatsApp"**.
-7. Sistem otomatis menyusun format teks pesanan rapi dan mengarahkan Anda langsung ke percakapan WhatsApp kasir/barista Himar Coffee untuk konfirmasi stok dan pembayaran.
+6. Klik tombol **"Lanjut ke Checkout"**.
+7. Isi nama dan nomor HP, lalu pilih metode: **Ambil di Kedai** (tanpa ongkir) atau **Himar Delivery** (ongkir flat Rp8.000, minimum order Rp30.000 — menu signature dihitung ganda sehingga lebih mudah mencapai minimum).
+8. Periksa ringkasan total di panel kanan, lalu klik tombol **"Bayar"**.
+9. Popup pembayaran Midtrans akan terbuka — pilih metode favorit Anda: QRIS, e-wallet (GoPay/ShopeePay/OVO), virtual account, atau kartu.
+10. Setelah pembayaran berhasil, halaman status pesanan akan menampilkan **"Pembayaran Diterima"** secara otomatis. Simpan kode pesanan (misal `HIMAR-4F7A21BC`) untuk mengecek status kembali lewat tautan yang sama.
+
+> Masih ingin memesan lewat chat? Tombol **"Pesan via WhatsApp (fallback)"** di keranjang tetap tersedia.
 
 ### 1.3 Bertanya ke Asisten Chatbot AI
 1. Klik tombol melayang lingkaran berwarna terracotta dengan ikon chat di pojok kanan bawah layar.

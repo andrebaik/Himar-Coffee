@@ -52,5 +52,27 @@ CREATE TABLE IF NOT EXISTS sales (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- Tabel pesanan (Amandemen v2: checkout online + Himar Delivery)
+CREATE TABLE IF NOT EXISTS orders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  order_code TEXT NOT NULL UNIQUE,
+  customer_name TEXT NOT NULL,
+  customer_phone TEXT NOT NULL,
+  fulfillment_type TEXT NOT NULL CHECK (fulfillment_type IN ('pickup','delivery')),
+  delivery_address TEXT,
+  note TEXT,
+  items JSONB NOT NULL DEFAULT '[]',
+  subtotal INTEGER NOT NULL CHECK (subtotal >= 0),
+  delivery_fee INTEGER NOT NULL DEFAULT 0 CHECK (delivery_fee >= 0),
+  total INTEGER NOT NULL CHECK (total >= 0),
+  status TEXT NOT NULL DEFAULT 'pending'
+    CHECK (status IN ('pending','paid','failed','expired','cancelled')),
+  midtrans_transaction_id TEXT,
+  midtrans_payment_type TEXT,
+  paid_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
 -- RLS aktif di semua tabel; backend memakai secret key (bypass RLS)
 -- Storage: bucket publik 'menu-images'

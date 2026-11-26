@@ -7,6 +7,8 @@ import Home from './pages/Home.jsx';
 import Menu from './pages/Menu.jsx';
 import Events from './pages/Events.jsx';
 import Visit from './pages/Visit.jsx';
+import Checkout from './pages/Checkout.jsx';
+import OrderStatus from './pages/OrderStatus.jsx';
 import NotFound from './pages/NotFound.jsx';
 import Login from './pages/admin/Login.jsx';
 import AdminMenus from './pages/admin/AdminMenus.jsx';
@@ -49,6 +51,22 @@ function App() {
             element={
               <Layout>
                 <Visit />
+              </Layout>
+            }
+          />
+          <Route
+            path="/checkout"
+            element={
+              <Layout>
+                <Checkout />
+              </Layout>
+            }
+          />
+          <Route
+            path="/order/:code"
+            element={
+              <Layout>
+                <OrderStatus />
               </Layout>
             }
           />

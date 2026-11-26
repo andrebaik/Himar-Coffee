@@ -14,7 +14,8 @@ Platform etalase digital modern, asisten chatbot AI cerdas, dan dasbor analitik 
 
 ### Solusi yang Diberikan:
 - **Katalog Menu Digital Responsif:** Pelanggan dapat menjelajahi menu, mencari minuman, melihat pilihan varian (*Hot/Iced*), dan memeriksa ketersediaan secara *real-time*.
-- **Keranjang Belanja Langsung ke WhatsApp:** Format pesanan terstandarisasi dengan validasi dan kalkulasi harga server-side, menghasilkan tautan langsung ke WhatsApp kasir.
+- **Checkout Online + Pembayaran Midtrans:** Format pesanan tervalidasi dengan kalkulasi harga server-side, pembayaran aman via Midtrans Snap (QRIS, e-wallet, virtual account, kartu), dan status pesanan *real-time* — tanpa perlu chat WhatsApp. *(Amandemen v2)*
+- **Himar Delivery:** Pilihan ambil di kedai (*pickup*) atau delivery dengan ongkir flat, minimum order nominal, dan menu **signature dihitung ganda** untuk memenuhi minimum. *(Amandemen v2)*
 - **Asisten AI Terintegrasi (Groq LLM + RAG):** Chatbot cerdas yang siap menjawab pertanyaan pelanggan 24/7 seputar menu, jadwal event, dan panduan order dengan tombol aksi cepat.
 - **Portal Admin Mandiri:** Antarmuka pengelola untuk menambah/mengedit/menghapus menu, mengunggah foto, mengatur jadwal event, dan membaca log percakapan.
 - **Dasbor Penjualan Interaktif (Streamlit):** Visualisasi tren pendapatan harian, menu terlaris (*best seller*), dan komposisi kategori penjualan.
@@ -25,7 +26,8 @@ Platform etalase digital modern, asisten chatbot AI cerdas, dan dasbor analitik 
 
 - **Katalog Menu & Filter:** Pencarian debounced, filter kategori instan, modal detail menu dengan pilihan varian dan penyesuaian harga dinamis.
 - **Agenda Event Komunitas:** Tab event mendatang dan arsip kegiatan yang telah usai (*live acoustic*, *workshop latte art*, dll).
-- **Keranjang Pesanan & Generator Tautan WhatsApp:** Penyimpanan lokal (*localStorage*), pengaturan kuantitas, catatan pesanan khusus, dan proteksi pemblokiran popup browser.
+- **Checkout Online & Pembayaran Midtrans Snap (Amandemen v2):** Halaman `/checkout` dengan data pemesan, pilihan pickup/delivery, ringkasan biaya, pembayaran via Snap popup (QRIS/e-wallet/VA/kartu), dan halaman status `/order/:code` dengan polling otomatis. Status *paid* hanya ditetapkan lewat webhook Midtrans yang terverifikasi signature.
+- **Himar Delivery (Amandemen v2):** Ongkir flat, minimum order nominal (default Rp30.000), menu signature dihitung ganda untuk minimum, badge & urutan prioritas signature di keranjang/checkout. Fallback pesan via WhatsApp tetap tersedia.
 - **Chatbot Asisten Berbasis AI:** Menggunakan model Groq `llama-3.3-70b-versatile` dengan konteks katalog teraktual (RAG) dan fallback intent classifier deterministik bila offline.
 - **Portal Manajemen Admin:**
   - Autentikasi aman berbasis Bearer JWT Supabase.
@@ -54,21 +56,24 @@ flowchart TD
     end
 
     subgraph CloudInfra[" Cloud & Layanan Eksternal"]
-        DB[(" PostgreSQL Supabase<br/>(Menus, Events, Sales, Logs)")]
+        DB[(" PostgreSQL Supabase<br/>(Menus, Events, Orders, Sales, Logs)")]
         Storage[" Supabase Storage<br/>(Bucket menu-images)"]
         Auth[" Supabase Auth<br/>(JWT Token Bearer)"]
         Groq[" Groq Cloud<br/>(LLaMA 3.3 70B Versatile)"]
-        WhatsApp[" WhatsApp Kasir<br/>(Pemesanan Terverifikasi)"]
+        Midtrans[" Midtrans Snap<br/>(Pembayaran QRIS/E-wallet/VA)"]
+        WhatsApp[" WhatsApp Kasir<br/>(Fallback Pemesanan)"]
     end
 
     Browser -->|"HTTP REST API (/api/v1)"| Backend
     Browser -->|"Iframe Embed"| Streamlit
-    Browser -.->|"Tautan Checkout"| WhatsApp
+    Browser -->|"Snap Popup (snap.js)"| Midtrans
+    Browser -.->|"Fallback Checkout"| WhatsApp
 
     Backend -->|"Query / Transaksi"| DB
     Backend -->|"Verifikasi Autentikasi"| Auth
     Backend -->|"Upload Foto Menu"| Storage
     Backend -->|"Request RAG Chat (/api/v1/chat)"| AIService
+    Backend -->|"Create Transaction + Webhook"| Midtrans
 
     AIService -->|"Inference Prompting"| Groq
     AIService -.->|"Sinkronisasi Katalog Menu"| Backend
@@ -96,7 +101,7 @@ sequenceDiagram
     participant AI as  AI Service (FastAPI)
     participant Groq as  Groq Cloud (LLM)
     participant DB as  Supabase DB
-    actor Kasir as  Kasir / Barista
+    participant MT as  Midtrans Snap
 
     rect rgb(250, 244, 234)
     note over Pelanggan, Groq: 1. Percakapan Chatbot AI (RAG)
@@ -111,14 +116,17 @@ sequenceDiagram
     end
 
     rect rgb(245, 247, 250)
-    note over Pelanggan, Kasir: 2. Checkout Pesanan via WhatsApp
-    Pelanggan->>Web: Tambah menu & varian ke keranjang
-    Pelanggan->>Web: Klik "Kirim Pesanan ke WhatsApp"
-    Web->>API: POST /api/v1/orders/whatsapp-link (items, nama, catatan)
-    API->>DB: Validasi menu_id & hitung total harga resmi (Anti-manipulasi)
-    API-->>Web: Response link WhatsApp terenkripsi URI
-    Web->>Kasir: Redirect ke WhatsApp dengan format pesanan rapi
-    Kasir-->>Pelanggan: Barista konfirmasi pesanan & instruksi pembayaran
+    note over Pelanggan, MT: 2. Checkout Online + Midtrans (Amandemen v2)
+    Pelanggan->>Web: Isi data, pilih Pickup / Himar Delivery
+    Web->>API: POST /api/v1/orders (items, nama, HP, alamat?)
+    API->>DB: Validasi menu & hitung total server-side + aturan delivery
+    API->>MT: createTransaction (Snap)
+    MT-->>API: snap_token + redirect_url
+    API-->>Web: {order_code, snap_token, total}
+    Web->>MT: Snap popup pembayaran
+    MT-->>API: POST /payments/notifications (webhook, signature diverifikasi)
+    API->>DB: Update status pesanan (pending → paid/expired/…)
+    Web->>API: GET /api/v1/orders/:code (polling status)
     end
 ```
 
@@ -193,12 +201,18 @@ web-himar/
 | `AI_SERVICE_URL` | URL ai-service FastAPI | `http://localhost:8000` |
 | `INTERNAL_API_KEY` | Kunci rahasia komunikasi antar-layanan | `himar_internal_2024_secret_key` |
 | `AI_TIMEOUT_MS` | Batas waktu request ke AI (ms) | `20000` |
+| `MIDTRANS_SERVER_KEY` | Server Key Midtrans (prefix `SB-Mid-server-` untuk sandbox) | `SB-Mid-server-...` |
+| `MIDTRANS_CLIENT_KEY` | Client Key Midtrans (prefix `SB-Mid-client-` untuk sandbox) | `SB-Mid-client-...` |
+| `MIDTRANS_IS_PRODUCTION` | `false` = sandbox Midtrans, `true` = production | `false` |
+| `DELIVERY_FEE` | Ongkir flat Himar Delivery (Rupiah) | `8000` |
+| `DELIVERY_MIN_ORDER` | Minimum subtotal untuk Himar Delivery (Rupiah) | `30000` |
 
 #### Frontend (`frontend/.env`):
 | Variabel | Deskripsi | Nilai Contoh |
 |----------|-----------|--------------|
 | `VITE_API_BASE_URL` | Base URL API backend | `http://localhost:4000/api/v1` |
 | `VITE_DASHBOARD_URL` | URL publik Dasbor Streamlit | `https://himar-coffee.streamlit.app` |
+| `VITE_MIDTRANS_CLIENT_KEY` | Client Key Midtrans untuk popup Snap | `SB-Mid-client-...` |
 
 #### AI Service (`ai-service/.env`):
 | Variabel | Deskripsi | Nilai Contoh |
@@ -371,12 +385,16 @@ npm run build
 ## 10. Keputusan Desain & Batasan Sistem
 
 ### Keputusan Desain:
-1. **Harga Tidak Pernah Dipercaya dari Klien:** Pada pemesanan via WhatsApp (`POST /api/v1/orders/whatsapp-link`), harga total selalu dihitung ulang di server berdasarkan data di database untuk mencegah manipulasi harga dari sisi pengguna.
+1. **Harga Tidak Pernah Dipercaya dari Klien:** Baik pada checkout Midtrans (`POST /orders`) maupun fallback WhatsApp (`POST /orders/whatsapp-link`), harga total selalu dihitung ulang di server berdasarkan data di database untuk mencegah manipulasi harga dari sisi pengguna.
 2. **Fallback Chatbot Deterministik:** Jika layanan LLM mengalami kegagalan koneksi (*rate limited* atau kuota habis), sistem secara otomatis mengaktifkan *fallback keyword classifier* sehingga chatbot tetap mampu melayani pertanyaan pelanggan tanpa henti.
 3. **Pemberitahuan Blokir Pop-up Manual:** Karena sejumlah peramban seluler secara *default* memblokir pembukaan tab otomatis melalui skrip, keranjang pesanan dilengkapi pendeteksi jendela pop-up dan menyediakan tombol manual *"Buka WhatsApp Manual"* yang andal.
 4. **Data Asli dari Dataset Excel:** Seed default kini memakai `Dataset Himar Coffee.xlsx` — **74 menu**, 11 kategori (termasuk *Signature Coffee* dan *Additional*), 5 event, serta **5.792 transaksi penjualan** (01-10-2025 s/d 30-09-2026, total Rp249.534.550) untuk mengisi dasbor. Harga dan varian mengikuti lembar `Varian_Harga`, sehingga varian bernama `Hot`/`Cold` (bukan lagi `Iced`). Lima menu signature (termasuk **The Lost Sheep** dan **Merry Gloss**) menjadi menu unggulan di beranda. Seed dummy lama tetap tersedia via `npm run seed:dummy`.
+5. **Status Pembayaran Hanya dari Webhook (Amandemen v2):** Frontend tidak pernah dipercaya soal status pembayaran. Status `paid` hanya ditetapkan oleh webhook `POST /payments/notifications` setelah signature `sha512` Midtrans terverifikasi dan nominal cocok dengan pesanan. Halaman status frontend hanya menampilkan hasil polling.
+6. **Aturan Himar Delivery di Backend (Amandemen v2):** Minimum order (default Rp30.000) dan ongkir flat (default Rp8.000) divalidasi di server, bukan hanya di UI. Menu `Signature Coffee` dihitung **ganda** untuk uji minimum (subtotal yang ditagih tetap asli), sehingga pesanan berisi signature lebih mudah mencapai minimum — sekaligus mendorong menu unggulan. Nominal dikendalikan env (`DELIVERY_MIN_ORDER`, `DELIVERY_FEE`) agar mudah diubah.
+7. **WhatsApp Tetap Sebagai Fallback (Amandemen v2):** Pelanggan yang enggan bayar online tetap bisa memesan via tautan WhatsApp (tombol sekunder di keranjang); alur utama kini sepenuhnya di website.
 
 ### Batasan yang Diketahui:
 - **Free Tier Cold Start:** Pada layanan hosting tier gratis (seperti Render), server dapat masuk ke mode *sleep* bila tidak ada aktivitas, mengakibatkan waktu tunggu 30-50 detik pada request pertama.
 - **Project Supabase Bisa Terhapus:** Project free tier yang lama tidak aktif dapat dihapus otomatis oleh Supabase. Gejalanya: `npm run upload:images`/`npm run seed` gagal dengan *"Host Supabase tidak ditemukan"*. Solusi: buat/aktifkan project di [dashboard Supabase](https://supabase.com/dashboard), jalankan `docs/schema.sql`, buat bucket publik `menu-images`, lalu perbarui `backend/.env` dan `dashboard/.env` dengan URL/kunci baru.
-- **Pemesanan Final Berbasis WhatsApp:** Sistem menyusun teks pesanan rapi dan mengarahkan ke WhatsApp; transaksi pembayaran dan konfirmasi ketersediaan fisik dilakukan langsung oleh barista kasir.
+- **Pembayaran Sandbox Midtrans (Amandemen v2):** Integrasi Midtrans saat ini memakai *sandbox* — semua transaksi tidak nyata. Untuk menerima pembayaran sungguhan: verifikasi akun Midtrans (KYC), ganti `MIDTRANS_SERVER_KEY`/`MIDTRANS_CLIENT_KEY`/`MIDTRANS_IS_PRODUCTION` di backend dan `VITE_MIDTRANS_CLIENT_KEY` di frontend, lalu daftarkan *Payment Notification URL* ke `<backend>/api/v1/payments/notifications` di dasbor Midtrans. Tabel `orders` harus sudah dibuat di Supabase (lihat `docs/schema.sql`).
+- **Himar Delivery Area Terbatas (Amandemen v2):** Ongkir flat mengasumsikan area layanan terbatas di sekitar Garut; alamat ditulis manual saat checkout dan konfirmasi akhir tetap oleh barista. Integrasi peta/ongkir per-kilometer belum tersedia.
