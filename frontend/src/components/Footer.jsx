@@ -1,17 +1,7 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
-  const location = useLocation();
-
-  // Klik "Kunjungi" saat sudah di anchor yang sama tidak mengubah URL,
-  // jadi scroll dilakukan manual.
-  const scrollToVisit = () => {
-    if (location.pathname === '/' && location.hash === '#kunjungi') {
-      document.getElementById('kunjungi')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
   return (
     <footer className="border-t border-[#ded2c1] bg-[#281a13] text-[#fffdf8]">
       <div className="editorial-container grid gap-12 py-14 md:grid-cols-[1.4fr_0.7fr_0.7fr] md:py-20">
@@ -27,7 +17,7 @@ export default function Footer() {
           <nav className="mt-5 grid gap-3 text-sm" aria-label="Navigasi footer">
             <Link className="text-[#fffdf8]/75 transition hover:text-[#fffdf8]" to="/menu">Menu</Link>
             <Link className="text-[#fffdf8]/75 transition hover:text-[#fffdf8]" to="/events">Event</Link>
-            <Link className="text-[#fffdf8]/75 transition hover:text-[#fffdf8]" to="/#kunjungi" onClick={scrollToVisit}>Kunjungi</Link>
+            <Link className="text-[#fffdf8]/75 transition hover:text-[#fffdf8]" to="/kunjungi">Kunjungi</Link>
           </nav>
         </div>
 

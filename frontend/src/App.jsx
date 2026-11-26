@@ -6,6 +6,7 @@ import Layout from './components/Layout.jsx';
 import Home from './pages/Home.jsx';
 import Menu from './pages/Menu.jsx';
 import Events from './pages/Events.jsx';
+import Visit from './pages/Visit.jsx';
 import NotFound from './pages/NotFound.jsx';
 import Login from './pages/admin/Login.jsx';
 import AdminMenus from './pages/admin/AdminMenus.jsx';
@@ -40,6 +41,14 @@ function App() {
             element={
               <Layout>
                 <Events />
+              </Layout>
+            }
+          />
+          <Route
+            path="/kunjungi"
+            element={
+              <Layout>
+                <Visit />
               </Layout>
             }
           />

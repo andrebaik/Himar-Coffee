@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Clock3, MapPin, MessageCircle } from 'lucide-react';
 
 const whatsappUrl = 'https://wa.me/62895620019593';
@@ -32,15 +33,23 @@ export default function VisitPanel() {
               <p className="mt-1 text-[#fffdf8]/72">Tarogong Kidul, Garut</p>
             </div>
           </div>
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 inline-flex min-h-11 w-fit items-center gap-2 border border-[#fffdf8]/50 px-4 py-3 text-xs font-bold uppercase tracking-[0.1em] transition hover:bg-[#fffdf8] hover:text-[#4f6d52]"
-          >
-            <MessageCircle className="h-4 w-4" aria-hidden="true" />
-            Tanya sebelum datang
-          </a>
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 w-fit items-center gap-2 border border-[#fffdf8]/50 px-4 py-3 text-xs font-bold uppercase tracking-[0.1em] transition hover:bg-[#fffdf8] hover:text-[#4f6d52]"
+            >
+              <MessageCircle className="h-4 w-4" aria-hidden="true" />
+              Tanya sebelum datang
+            </a>
+            <Link
+              to="/kunjungi"
+              className="inline-flex min-h-11 w-fit items-center border border-[#fffdf8]/50 px-4 py-3 text-xs font-bold uppercase tracking-[0.1em] transition hover:bg-[#fffdf8] hover:text-[#4f6d52]"
+            >
+              Detail kunjungan
+            </Link>
+          </div>
         </div>
       </div>
     </section>
