@@ -6,6 +6,8 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "seed": "node scripts/seed.js",
+    "seed:dummy": "node scripts/seed_dummy.js",
+    "upload:images": "node scripts/upload_menu_images.js",
     "test": "vitest run",
     "test:watch": "vitest"
   },

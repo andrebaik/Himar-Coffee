@@ -52,7 +52,7 @@ def fallback_keyword_classifier(message: str) -> Dict[str, Any]:
         return {
             "intent": "tanya_menu",
             "confidence": 0.9,
-            "reply": "Menu unggulan kami adalah The Lost Sheep dan Merry Gloss. Silakan cek halaman menu untuk melihat semua pilihan!"
+            "reply": "Menu unggulan kami adalah Klepon Milky Coffee dan Spanish Latte. Silakan cek halaman menu untuk melihat semua pilihan!"
         }
     return {
         "intent": "di_luar_konteks",

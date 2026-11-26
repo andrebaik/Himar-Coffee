@@ -226,12 +226,24 @@ Pastikan skema tabel di `docs/schema.sql` telah dieksekusi di SQL Editor Supabas
 cd backend
 npm install
 
-# Jalankan seed data katalog menu dan event
+# 1) Unggah 62 foto produk asli ke Supabase Storage (butuh koneksi internet)
+#    Sumber foto: folder product-photos/ di root repo (tidak ikut Git).
+#    Hasil mapping URL disimpan di scripts/image-map.json.
+npm run upload:images
+
+# 2) Seed menu asli + event contoh
 npm run seed
+
+# Alternatif tanpa foto/Supabase Storage: seed data dummy lama
+npm run seed:dummy
 
 # Jalankan seed simulasi transaksi penjualan untuk dasbor
 node scripts/seed_sales.js
 ```
+
+> ⚠️ **Harga pada seed menu asli masih estimasi.** Periksa dan sesuaikan harga
+> lewat halaman admin (`/admin/menus`) sebelum demo. Nama menu diambil dari
+> foto produk di `product-photos/`.
 
 ### 2. Menjalankan Backend Express
 ```bash
@@ -343,6 +355,7 @@ npm run build
 1. **Harga Tidak Pernah Dipercaya dari Klien:** Pada pemesanan via WhatsApp (`POST /api/v1/orders/whatsapp-link`), harga total selalu dihitung ulang di server berdasarkan data di database untuk mencegah manipulasi harga dari sisi pengguna.
 2. **Fallback Chatbot Deterministik:** Jika layanan LLM mengalami kegagalan koneksi (*rate limited* atau kuota habis), sistem secara otomatis mengaktifkan *fallback keyword classifier* sehingga chatbot tetap mampu melayani pertanyaan pelanggan tanpa henti.
 3. **Pemberitahuan Blokir Pop-up Manual:** Karena sejumlah peramban seluler secara *default* memblokir pembukaan tab otomatis melalui skrip, keranjang pesanan dilengkapi pendeteksi jendela pop-up dan menyediakan tombol manual *"Buka WhatsApp Manual"* yang andal.
+4. **Menu Asli Menggantikan Data Dummy:** Seed default kini memakai 62 menu asli Himar Coffee yang diekstrak dari foto produk, diunggah ke Supabase Storage. Harga masih estimasi (mudah diubah lewat admin). Dua menu unggulan dipilih dari menu asli — **Klepon Milky Coffee** dan **Spanish Latte** — menggantikan nama dummy *The Lost Sheep* dan *Merry Gloss* dari spesifikasi awal. Seed dummy lama tetap tersedia via `npm run seed:dummy`.
 
 ### Batasan yang Diketahui:
 - **Free Tier Cold Start:** Pada layanan hosting tier gratis (seperti Render), server dapat masuk ke mode *sleep* bila tidak ada aktivitas, mengakibatkan waktu tunggu 30-50 detik pada request pertama.

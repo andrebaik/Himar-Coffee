@@ -101,7 +101,7 @@ export default function Menu() {
                 type="search"
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Contoh: The Lost Sheep"
+                placeholder="Contoh: Klepon Milky Coffee"
                 className="min-h-12 w-full border-b border-[#281a13] bg-transparent pl-8 pr-10 text-base text-[#281a13] placeholder:text-[#6b625b]/70 focus:border-[#b5532c] focus:outline-none"
               />
               {searchQuery && (

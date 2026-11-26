@@ -37,6 +37,10 @@ Thumbs.db
 # Testing coverage
 coverage/
 
+# Foto produk sumber (di-upload ke Supabase Storage oleh scripts/upload_menu_images.js)
+product-photos/
+backend/scripts/image-map.json
+
 # Python cache (for ai-service & dashboard)
 __pycache__/
 *.py[cod]

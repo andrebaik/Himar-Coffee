@@ -175,7 +175,7 @@ export default function MenuFormModal({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Contoh: The Lost Sheep"
+              placeholder="Contoh: Klepon Milky Coffee"
               className={`w-full p-2.5 bg-[#FAF4EA]/40 border rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#B5532C] ${
                 fieldErrors.name ? 'border-red-500 bg-red-50/20' : 'border-[#E7DCCB]'
               }`}
