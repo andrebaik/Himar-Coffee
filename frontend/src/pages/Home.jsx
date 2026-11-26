@@ -254,7 +254,7 @@ export default function Home() {
         </div>
       </section>
 
-      <div id="kunjungi">
+      <div id="kunjungi" className="scroll-mt-24">
         <VisitPanel />
       </div>
 

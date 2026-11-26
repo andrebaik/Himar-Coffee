@@ -36,6 +36,15 @@ export default function Navbar() {
 
   const closeMenu = () => setIsMenuOpen(false);
 
+  // Jika pengguna mengklik "Kunjungi" saat sudah berada di anchor yang sama,
+  // URL tidak berubah sehingga perlu scroll manual.
+  const handleNavClick = (path) => {
+    closeMenu();
+    if (path === '/#kunjungi' && location.pathname === '/' && location.hash === '#kunjungi') {
+      document.getElementById('kunjungi')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <header className="sticky top-0 z-40 border-b border-[#ded2c1] bg-[#f7f2e9]">
       <div className="editorial-container flex min-h-[4.5rem] items-center justify-between gap-5">
@@ -54,6 +63,7 @@ export default function Navbar() {
             <Link
               key={link.path}
               to={link.path}
+              onClick={() => handleNavClick(link.path)}
               className={`relative inline-flex min-h-11 items-center text-xs font-bold uppercase tracking-[0.1em] transition ${
                 isActive(link.path) ? 'text-[#b5532c]' : 'text-[#6b625b] hover:text-[#281a13]'
               }`}
@@ -100,7 +110,7 @@ export default function Navbar() {
               <Link
                 key={link.path}
                 to={link.path}
-                onClick={closeMenu}
+                onClick={() => handleNavClick(link.path)}
                 className={`flex min-h-12 items-center justify-between border-b border-[#ded2c1] text-lg ${
                   isActive(link.path) ? 'font-semibold text-[#b5532c]' : 'text-[#281a13]'
                 }`}
