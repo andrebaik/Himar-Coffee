@@ -39,7 +39,9 @@ export default function Checkout() {
     customer_phone: '',
     fulfillment_type: 'pickup',
     delivery_address: '',
+    delivery_map_url: '',
   });
+  const [geoStatus, setGeoStatus] = useState('idle'); // idle | loading | error
   const [fieldErrors, setFieldErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [snapError, setSnapError] = useState(null);
@@ -64,6 +66,25 @@ export default function Checkout() {
   const setField = (name, value) => {
     setForm((prev) => ({ ...prev, [name]: value }));
     setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
+  };
+
+  // Ambil titik lokasi dari GPS perangkat, simpan sebagai link Google Maps.
+  const handleSetMaps = () => {
+    if (!navigator.geolocation) {
+      setGeoStatus('error');
+      return;
+    }
+    setGeoStatus('loading');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const url = `https://www.google.com/maps?q=${latitude.toFixed(6)},${longitude.toFixed(6)}`;
+        setField('delivery_map_url', url);
+        setGeoStatus('idle');
+      },
+      () => setGeoStatus('error'),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
   };
 
   const validateForm = () => {
@@ -105,6 +126,7 @@ export default function Checkout() {
         customer_phone: form.customer_phone.trim(),
         fulfillment_type: form.fulfillment_type,
         delivery_address: isDelivery ? form.delivery_address.trim() : undefined,
+        delivery_map_url: isDelivery && form.delivery_map_url.trim() ? form.delivery_map_url.trim() : undefined,
       });
 
       try {
@@ -273,6 +295,57 @@ export default function Checkout() {
                   <span className="text-[#b5532c]">{fieldErrors.delivery_address}</span>
                 ) : <span />}
                 <span>{form.delivery_address.length}/250</span>
+              </div>
+
+              {/* Titik lokasi: GPS perangkat atau tempel link Google Maps */}
+              <div className="mt-4 border border-dashed border-[#ded2c1] bg-[#faf6ef] p-4">
+                <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#281a13]">
+                  Titik lokasi (Google Maps)
+                </p>
+                <p className="mt-1 text-xs text-[#6b625b]">
+                  Bantu kurir menemukan titik tepatnya. Opsional, tapi sangat membantu.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleSetMaps}
+                  disabled={geoStatus === 'loading'}
+                  className="mt-3 inline-flex items-center gap-2 border border-[#281a13] bg-[#281a13] px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] text-[#f5efe4] transition hover:opacity-90 disabled:opacity-60"
+                >
+                  <MapPin className="h-4 w-4" aria-hidden="true" />
+                  {geoStatus === 'loading' ? 'Mencari lokasi…' : 'Set di Google Maps'}
+                </button>
+                {geoStatus === 'error' && (
+                  <p className="mt-2 text-xs text-[#b5532c]">
+                    Gagal mengambil lokasi GPS. Izinkan akses lokasi, atau tempel link Google Maps manual di bawah.
+                  </p>
+                )}
+                {form.delivery_map_url && (
+                  <p className="mt-2 text-xs text-[#6b625b]">
+                    Titik tersimpan —{' '}
+                    <a
+                      href={form.delivery_map_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-bold text-[#b5532c] underline"
+                    >
+                      lihat di Google Maps
+                    </a>
+                  </p>
+                )}
+                <input
+                  type="url"
+                  value={form.delivery_map_url}
+                  onChange={(e) => {
+                    setGeoStatus('idle');
+                    setField('delivery_map_url', e.target.value);
+                  }}
+                  placeholder="atau tempel link Google Maps di sini"
+                  maxLength={500}
+                  className="mt-3 w-full border bg-transparent p-2.5 text-sm text-[#281a13] placeholder:text-[#6b625b]/70 focus:border-[#b5532c] focus:outline-none"
+                />
+                {fieldErrors.delivery_map_url && (
+                  <p className="mt-1 text-xs text-[#b5532c]">{fieldErrors.delivery_map_url}</p>
+                )}
               </div>
             </div>
           )}

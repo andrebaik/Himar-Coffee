@@ -491,6 +491,7 @@ minimum dan tanpa ongkir.
 | `customer_phone` | string | Ya | Nomor HP (9-16 digit, awalan 0/62/8) |
 | `fulfillment_type` | string | Ya | `pickup` atau `delivery` |
 | `delivery_address` | string | Kondisional | Wajib jika `fulfillment_type=delivery` (max 250 karakter) |
+| `delivery_map_url` | string | Tidak | Link titik lokasi Google Maps (URL http/https, max 500). Hanya disimpan untuk `delivery`; dikosongkan otomatis untuk `pickup` |
 
 **Curl:**
 
@@ -505,7 +506,8 @@ curl -X POST http://localhost:4000/api/v1/orders \
     "customer_name": "Budi Santoso",
     "customer_phone": "081234567890",
     "fulfillment_type": "delivery",
-    "delivery_address": "Jl. Raya Garut No. 10, Tarogong Kidul"
+    "delivery_address": "Jl. Raya Garut No. 10, Tarogong Kidul",
+    "delivery_map_url": "https://www.google.com/maps?q=-7.150300,107.906500"
   }'
 ```
 
@@ -564,6 +566,7 @@ Status: `pending`, `paid`, `failed`, `expired`, `cancelled`.
     "customer_name": "Budi Santoso",
     "fulfillment_type": "delivery",
     "delivery_address": "Jl. Raya Garut No. 10, Tarogong Kidul",
+    "delivery_map_url": "https://www.google.com/maps?q=-7.150300,107.906500",
     "note": "Tidak pakai gula",
     "items": [
       { "menu_id": "...", "name": "The Lost Sheep", "variant": "Cold", "unit_price": 38000, "quantity": 1, "is_signature": true }

@@ -117,7 +117,7 @@ const validateDeliveryRules = (fulfillmentType, effectiveSubtotal) => {
  * Buat pesanan baru + transaksi Midtrans Snap.
  */
 export const createOrder = async (payload) => {
-  const { items, note, customer_name, customer_phone, fulfillment_type, delivery_address } = payload;
+  const { items, note, customer_name, customer_phone, fulfillment_type, delivery_address, delivery_map_url } = payload;
 
   const { snapshot, subtotal, effectiveSubtotal } = await resolveItems(items);
   validateDeliveryRules(fulfillment_type, effectiveSubtotal);
@@ -151,6 +151,10 @@ export const createOrder = async (payload) => {
         customer_phone,
         fulfillment_type,
         delivery_address: fulfillment_type === 'delivery' ? delivery_address.trim() : null,
+        delivery_map_url:
+          fulfillment_type === 'delivery' && delivery_map_url && delivery_map_url.trim()
+            ? delivery_map_url.trim()
+            : null,
         note: note && note.trim() ? note.trim() : null,
         items: snapshot,
         subtotal,
@@ -229,7 +233,7 @@ export const getOrderByCode = async (orderCode) => {
   const { data, error } = await supabaseAdmin
     .from('orders')
     .select(
-      'order_code, customer_name, fulfillment_type, delivery_address, note, items, subtotal, delivery_fee, total, status, midtrans_payment_type, created_at, paid_at'
+      'order_code, customer_name, fulfillment_type, delivery_address, delivery_map_url, note, items, subtotal, delivery_fee, total, status, midtrans_payment_type, created_at, paid_at'
     )
     .eq('order_code', orderCode)
     .maybeSingle();

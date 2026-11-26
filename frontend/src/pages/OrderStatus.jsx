@@ -192,6 +192,20 @@ export default function OrderStatus() {
               </>
             )}
           </p>
+          {order.fulfillment_type === 'delivery' && order.delivery_map_url && (
+            <p className="sm:col-span-2">
+              Titik lokasi:{' '}
+              <a
+                href={order.delivery_map_url}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 font-bold text-[#b5532c] underline"
+              >
+                <MapPin className="h-4 w-4" aria-hidden="true" />
+                Buka di Google Maps
+              </a>
+            </p>
+          )}
           {order.midtrans_payment_type && (
             <p>
               Metode bayar: <strong className="text-[#281a13]">{order.midtrans_payment_type}</strong>

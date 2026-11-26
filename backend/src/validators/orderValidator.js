@@ -65,4 +65,14 @@ export const createOrderSchema = Joi.object({
   delivery_address: Joi.string().trim().max(250).optional().allow('', null).messages({
     'string.max': 'Alamat maksimal 250 karakter',
   }),
+  delivery_map_url: Joi.string()
+    .trim()
+    .max(500)
+    .uri({ scheme: ['http', 'https'] })
+    .optional()
+    .allow('', null)
+    .messages({
+      'string.max': 'Link Google Maps maksimal 500 karakter',
+      'string.uri': 'Link lokasi harus berupa URL yang valid (mis. link Google Maps)',
+    }),
 });

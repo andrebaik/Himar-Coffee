@@ -229,6 +229,53 @@ describe('POST /api/v1/orders (Checkout Midtrans)', () => {
     expect(res.body.error.message).toContain('Alamat');
   });
 
+  it('delivery dengan link Google Maps valid: titik lokasi tersimpan', async () => {
+    const res = await request(app)
+      .post('/api/v1/orders')
+      .send(
+        baseOrderBody({
+          items: [{ menu_id: LOST_SHEEP_ID, quantity: 2 }],
+          fulfillment_type: 'delivery',
+          delivery_address: 'Jl. Merdeka No. 1, Garut',
+          delivery_map_url: 'https://www.google.com/maps?q=-7.150300,107.906500',
+        })
+      );
+
+    expect(res.status).toBe(201);
+    expect(h.state.orders[0].delivery_map_url).toBe('https://www.google.com/maps?q=-7.150300,107.906500');
+  });
+
+  it('delivery_map_url bukan URL ditolak 400 VALIDATION_ERROR', async () => {
+    const res = await request(app)
+      .post('/api/v1/orders')
+      .send(
+        baseOrderBody({
+          items: [{ menu_id: LOST_SHEEP_ID, quantity: 2 }],
+          fulfillment_type: 'delivery',
+          delivery_address: 'Jl. Merdeka No. 1, Garut',
+          delivery_map_url: 'bukan-link-maps',
+        })
+      );
+
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  it('pickup tidak menyimpan delivery_map_url meski dikirim', async () => {
+    const res = await request(app)
+      .post('/api/v1/orders')
+      .send(
+        baseOrderBody({
+          items: [{ menu_id: LOST_SHEEP_ID, quantity: 2 }],
+          fulfillment_type: 'pickup',
+          delivery_map_url: 'https://www.google.com/maps?q=-7.150300,107.906500',
+        })
+      );
+
+    expect(res.status).toBe(201);
+    expect(h.state.orders[0].delivery_map_url).toBeNull();
+  });
+
   it('menu tidak tersedia ditolak 400', async () => {
     const res = await request(app)
       .post('/api/v1/orders')

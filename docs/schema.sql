@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS orders (
   customer_phone TEXT NOT NULL,
   fulfillment_type TEXT NOT NULL CHECK (fulfillment_type IN ('pickup','delivery')),
   delivery_address TEXT,
+  delivery_map_url TEXT,
   note TEXT,
   items JSONB NOT NULL DEFAULT '[]',
   subtotal INTEGER NOT NULL CHECK (subtotal >= 0),
