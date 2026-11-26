@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createClient } from '@supabase/supabase-js';
 import { realMenus, dummyEvents } from './real-menu-data.js';
+import { assertSupabaseHost } from './preflight.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const imageMapPath = path.join(__dirname, 'image-map.json');
@@ -28,6 +29,8 @@ const loadImageMap = async () => {
 };
 
 const seed = async () => {
+  await assertSupabaseHost();
+
   const images = await loadImageMap();
   console.log('🌱 Memulai seed menu asli Himar Coffee...\n');
 

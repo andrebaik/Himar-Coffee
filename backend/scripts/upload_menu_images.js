@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createClient } from '@supabase/supabase-js';
 import { realMenus } from './real-menu-data.js';
+import { assertSupabaseHost } from './preflight.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '../..');
@@ -36,6 +37,9 @@ const slugify = (value) =>
     .replace(/^-+|-+$/g, '');
 
 const uploadImages = async () => {
+  // Dry run hanya memvalidasi file & mapping, tidak butuh jaringan.
+  if (!DRY_RUN) await assertSupabaseHost();
+
   if (!existsSync(photoDir)) {
     throw new Error(
       `Folder foto tidak ditemukan: ${photoDir}\n` +

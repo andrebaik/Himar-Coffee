@@ -359,4 +359,5 @@ npm run build
 
 ### Batasan yang Diketahui:
 - **Free Tier Cold Start:** Pada layanan hosting tier gratis (seperti Render), server dapat masuk ke mode *sleep* bila tidak ada aktivitas, mengakibatkan waktu tunggu 30-50 detik pada request pertama.
+- **Project Supabase Bisa Terhapus:** Project free tier yang lama tidak aktif dapat dihapus otomatis oleh Supabase. Gejalanya: `npm run upload:images`/`npm run seed` gagal dengan *"Host Supabase tidak ditemukan"*. Solusi: buat/aktifkan project di [dashboard Supabase](https://supabase.com/dashboard), jalankan `docs/schema.sql`, buat bucket publik `menu-images`, lalu perbarui `backend/.env` dan `dashboard/.env` dengan URL/kunci baru.
 - **Pemesanan Final Berbasis WhatsApp:** Sistem menyusun teks pesanan rapi dan mengarahkan ke WhatsApp; transaksi pembayaran dan konfirmasi ketersediaan fisik dilakukan langsung oleh barista kasir.
